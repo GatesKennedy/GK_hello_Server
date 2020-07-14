@@ -1,0 +1,9 @@
+node_modules/
+config/
+ignorant/
+
+.env
+.env.development
+.env.production
+.env.example
+latest.dump
