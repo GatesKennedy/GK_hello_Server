@@ -13,7 +13,7 @@ CREATE TYPE field_type  AS ENUM ('thought, puzzle, entity, img_url');
 CREATE TYPE share_type  AS ENUM ('text', 'image', 'audio', 'link', 'collab');
 
 CREATE TABLE IF NOT EXISTS tbl_user(
-    id UUID DEFAULT uuid_generate_v4(),
+    id          UUID        NOT NULL DEFAULT uuid_generate_v4(),
     name        VARCHAR(16) NOT NULL,
     email       VARCHAR(64) NOT NULL,
     password    VARCHAR(64) NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS tbl_profile(
     entity          entity_type     NOT NULL DEFAULT 'void',
     website         VARCHAR(128)    NOT NULL DEFAULT 'void',
     thought         VARCHAR         NOT NULL DEFAULT 'void',
-    puzzle          TEXT            NOT NULL DEFAULT 'what seperates problem from puzzle?',
+    puzzle          TEXT            NOT NULL DEFAULT 'void',
     img_url         TEXT            NOT NULL DEFAULT 'NO_URL',
     location VARCHAR(50)
 );
@@ -76,8 +76,8 @@ CREATE TABLE IF NOT EXISTS tbl_collab(
 --  .sql Script from CMD
 --===============================
 --  psql -U user_name -d db_name -a -f <file_path>
---  psql -U ohnodamn -d db_nds -f C:\Programming\Gates_Kennedy\NeedleDropCo\nds\server___________\nds_db\scripts\nds_seed.sql
+--  psql -U ohnodamn -d db_nds -f C:\Programming\Gates_Kennedy\GK_hello\GK_hello_Server\db_______\scripts\seed.sql
 --  ~Heroku~
 --  Not Connected to Heroku psql:
 --      cat <file_name> | heroku pg:psql
---      cat C:\Programming\Gates_Kennedy\NeedleDropCo\nds\server___________\nds_db\scripts\nds_seed.sql | heroku pg:psql
+--      cat C:\Programming\Gates_Kennedy\GK_hello\GK_hello_Server\db_______\scripts\seed.sql | heroku pg:psql
