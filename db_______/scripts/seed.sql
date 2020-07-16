@@ -26,7 +26,7 @@ CREATE TYPE share_type  AS ENUM ('text', 'image', 'audio', 'link', 'collab');
 
 CREATE TABLE IF NOT EXISTS tbl_user(
     id          UUID        NOT NULL DEFAULT uuid_generate_v4(),
-    name        VARCHAR(16) NOT NULL,
+    name        VARCHAR(16) NOT NULL,                           
     email       VARCHAR(64) NOT NULL,
     password    VARCHAR(64) NOT NULL,
     role        role_type   NOT NULL DEFAULT 'user',
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS tbl_prof_history(
 
 CREATE TABLE IF NOT EXISTS tbl_talk(
     id          UUID        DEFAULT uuid_generate_v4(),
-    type        talk_type   NOT NULL,
+    type        talk_type   NOT NULL,                           --  INDEX
     seen        BOOLEAN     NOT NULL DEFAULT true,
     date_init   DATE        NOT NULL DEFAULT CURRENT_DATE,
     PRIMARY KEY (id)
@@ -61,10 +61,9 @@ CREATE TABLE IF NOT EXISTS tbl_talk(
 CREATE TABLE IF NOT EXISTS tbl_talk_history(
     id          SERIAL,
     talk_id     UUID        REFERENCES tbl_talk(id) NOT NULL,  --  INDEX
-    type        share_type  NOT NULL, 
-    body        JSONB       NOT NULL,
+    body        JSONB       NOT NULL,                          --  INDEX
     seen        BOOLEAN     NOT NULL DEFAULT true,
-    date_edit   DATE        NOT NULL DEFAULT CURRENT_DATE,      --  INDEX
+    date_edit   DATE        NOT NULL DEFAULT CURRENT_DATE,      
     edit_note   TEXT        NOT NULL DEFAULT 'NO_ENTRY',        --(-_-)--
     PRIMARY KEY (id)
 );
@@ -73,6 +72,20 @@ CREATE TABLE IF NOT EXISTS tbl_access(
     talk_id     UUID        REFERENCES tbl_talk(id) NOT NULL,
     PRIMARY KEY (user_id, talk_id)
 );
+
+--~~~~~~~~~~~~~~~~~
+--      INDEX
+CREATE INDEX idx_talktype    ON tbl_talk                     (type);
+CREATE INDEX idx_talkid      ON tbl_talk_history             (talk_id);
+CREATE INDEX idxgin_project  ON tbl_talk_history USING gin   ((body -> 'type') jsonb_path_ops);
+CREATE INDEX idx_genre       ON tbl_access                   (user_id);
+
+--~~~~~~~~~~~~~~~~~~~~~~
+--      UPDATE
+
+--~~~~~~~~~~~~~~~~~
+--      VIEW
+
 
 --  .sql Script from CMD
 --===============================
