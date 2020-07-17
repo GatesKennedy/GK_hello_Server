@@ -21,8 +21,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TYPE entity_type AS ENUM ('void', 'personal', 'biz_sml', 'biz_med', 'biz_lrg');
 CREATE TYPE role_type   AS ENUM ('admin', 'dev', 'user');
 CREATE TYPE field_type  AS ENUM ('thought', 'puzzle', 'entity', 'img_url');
-CREATE TYPE talk_type   AS ENUM ('chat', 'collab');
-CREATE TYPE share_type  AS ENUM ('text', 'image', 'audio', 'link', 'collab');
+CREATE TYPE talk_type   AS ENUM ('chat', 'note');
+CREATE TYPE share_type  AS ENUM ('text', 'image', 'audio', 'link', 'note');
 
 CREATE TABLE IF NOT EXISTS tbl_user(
     id          UUID        NOT NULL DEFAULT uuid_generate_v4(),
