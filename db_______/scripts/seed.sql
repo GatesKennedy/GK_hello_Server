@@ -2,7 +2,7 @@
 --  db_chat     ohnodamn    utf8
 --88888888 88888888 88888888 88888888 88888888 88888888 88888888 88888888 
 
-DROP TABLE IF EXISTS tbl_user           CASCADE;      -- 3
+DROP TABLE IF EXISTS tbl_user           CASCADE;      -- 4
 DROP TABLE IF EXISTS tbl_talk           CASCADE;      -- 2
 DROP TABLE IF EXISTS tbl_profile        CASCADE;      -- 0
 DROP TABLE IF EXISTS tbl_prof_history   CASCADE;      -- 0
@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS tbl_talk(
 CREATE TABLE IF NOT EXISTS tbl_talk_history(
     id          SERIAL,
     talk_id     UUID        REFERENCES tbl_talk(id) NOT NULL,  --  INDEX
+    send_id     UUID        REFERENCES tbl_user(id) NOT NULL,  --  INDEX
     body        JSONB       NOT NULL,                          --  INDEX
     seen        BOOLEAN     NOT NULL DEFAULT true,
     date_edit   DATE        NOT NULL DEFAULT CURRENT_DATE,      
@@ -77,6 +78,7 @@ CREATE TABLE IF NOT EXISTS tbl_access(
 --      INDEX
 CREATE INDEX idx_talktype    ON tbl_talk                     (type);
 CREATE INDEX idx_talkid      ON tbl_talk_history             (talk_id);
+CREATE INDEX idx_sendid      ON tbl_talk_history             (send_id);
 CREATE INDEX idxgin_project  ON tbl_talk_history USING gin   ((body -> 'type') jsonb_path_ops);
 CREATE INDEX idx_genre       ON tbl_access                   (user_id);
 

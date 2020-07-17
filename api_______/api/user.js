@@ -151,13 +151,11 @@ router.post(
       return response.status(400).json({ errors: errors.array() });
     }
 
-    const { username, email, password } = request.body;
-    const role = 'user';
+    const { username, email, password, role } = request.body;
 
     //  Async db Connection
     const client = await pool.connect();
     try {
-      //  Check: User Registration
       await client.query('BEGIN');
       //  Check Email exists
       const queryText = 'SELECT name FROM tbl_user WHERE email = ($1)';
@@ -172,17 +170,60 @@ router.post(
       const salt = await bcrypt.genSalt(10);
       const pwCrypt = await bcrypt.hash(password, salt);
       console.log('>Password');
+      //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Create User
-      const insertText = `INSERT INTO tbl_user(name, email, password, role) 
+      const insertText = `
+        INSERT INTO tbl_user(name, email, password, role) 
         VALUES($1, $2, $3, $4) 
-        RETURNING id`;
+        RETURNING id, name, role`;
       const insertValues = [username, email, pwCrypt, role];
-      const rez = await client.query(insertText, insertValues);
-      console.log('>INSERT');
+      const resUser = await client.query(insertText, insertValues);
+      const userId = resUser.rows[0].id;
+      console.log('>INSERT\n', resUser.rows[0]);
+      if (role === 'user') {
+        //  Create Chat
+        const chatText = `
+      INSERT INTO tbl_talk(type)
+      VALUES($1)
+      RETURNING id;
+      `;
+        const resChat = await client.query(chatText, ['chat']);
+        const chatId = resChat.rows[0].id;
+        console.log('>CHAT');
+
+        //  Create Access
+        const accessText = `
+      INSERT INTO tbl_access(user_id, talk_id)
+      VALUES($1, $2);
+      `;
+        await client.query(accessText, [userId, chatId]);
+        console.log('>ACCESS');
+
+        //  Create History
+        const initText = `
+      INSERT INTO tbl_talk_history(talk_id, send_id, body, edit_note)
+      VALUES($1, $2, $3, $4)
+      RETURNING date_edit, edit_note;
+      `;
+        const body = {
+          type: 'chat',
+          text: `Hello ${username}, <br> Glad you could make it. (^=^)`,
+        };
+
+        const conorId = '3b65075b-e334-46f7-bb1d-8a6bdbffcaa3';
+        const resInit = await client.query(initText, [
+          chatId,
+          conorId,
+          body,
+          'init',
+        ]);
+        console.log('>HISTORY INIT \n', resInit.rows[0]);
+      }
+      //~~~~~~~~~~~~~~~~~~~~~~
       //  Return JWT
       const payload = {
         user: {
-          id: rez.rows[0].id,
+          id: userId,
         },
       };
       jwt.sign(payload, shhh, { expiresIn: 1800 }, (err, token) => {
