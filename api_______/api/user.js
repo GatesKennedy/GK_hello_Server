@@ -63,9 +63,9 @@ router.post(
   ],
   async (request, response, next) => {
     console.log('(^=^) LOGIN USER > POST: api/auth/ > Enter FXN');
+    console.log('(o_O) LOGIN USER > request.body: \n', request.body);
     const { email, password } = request.body;
-    const bodyStr = JSON.stringify(request.body);
-    console.log('(o_O) LOGIN USER > body: ' + bodyStr);
+
     //  Validation Error Response
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
@@ -110,7 +110,21 @@ router.post(
         if (err) throw err;
         const tokenLoad = JSON.stringify(token);
         console.log('(o_O) LOGIN USER > tokenLoad: ' + tokenLoad);
-        response.json({ token });
+        res.rows[0].role === 'admin'
+          ? response
+              .json({
+                token: token,
+                username: res.rows[0].name,
+                msg: 'thank god... hi conor.',
+              })
+              .redirect('/talk')
+          : response
+              .json({
+                token: token,
+                username: res.rows[0].name,
+                msg: 'oh cool. welcome back',
+              })
+              .redirect('/talk');
       });
 
       //  COMMIT
