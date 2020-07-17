@@ -152,7 +152,9 @@ router.post(
     }
 
     const { username, email, password, role } = request.body;
-
+    if (role === 'admin') {
+      response.json({ hack: true, msg: 'I love you... do you?' });
+    }
     //  Async db Connection
     const client = await pool.connect();
     try {
@@ -172,12 +174,12 @@ router.post(
       console.log('>Password');
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Create User
-      const insertText = `
+      const userText = `
         INSERT INTO tbl_user(name, email, password, role) 
         VALUES($1, $2, $3, $4) 
         RETURNING id, name, role`;
       const insertValues = [username, email, pwCrypt, role];
-      const resUser = await client.query(insertText, insertValues);
+      const resUser = await client.query(userText, insertValues);
       const userId = resUser.rows[0].id;
       console.log('>INSERT\n', resUser.rows[0]);
       if (role === 'user') {
@@ -218,6 +220,15 @@ router.post(
           'init',
         ]);
         console.log('>HISTORY INIT \n', resInit.rows[0]);
+
+        //  New Chat Notification
+        if (resInit.rows[0].edit_note === 'init') {
+          // some email notification
+        }
+        //  New Admin WARNING
+        if (resInit.rows[0].edit_note === 'init') {
+          // some email notification
+        }
       }
       //~~~~~~~~~~~~~~~~~~~~~~
       //  Return JWT
