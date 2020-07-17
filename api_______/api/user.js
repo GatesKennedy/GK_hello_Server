@@ -178,8 +178,8 @@ router.post(
         INSERT INTO tbl_user(name, email, password, role) 
         VALUES($1, $2, $3, $4) 
         RETURNING id, name, role`;
-      const insertValues = [username, email, pwCrypt, role];
-      const resUser = await client.query(userText, insertValues);
+      const userValues = [username, email, pwCrypt, role];
+      const resUser = await client.query(userText, userValues);
       const userId = resUser.rows[0].id;
       console.log('>INSERT\n', resUser.rows[0]);
       if (role === 'user') {
@@ -226,7 +226,7 @@ router.post(
           // some email notification
         }
         //  New Admin WARNING
-        if (resInit.rows[0].edit_note === 'init') {
+        if (resUser.rows[0].role === 'admin') {
           // some email notification
         }
       }
