@@ -115,7 +115,7 @@ router.post(
               .json({
                 token: token,
                 username: res.rows[0].name,
-                msg: 'thank god... hi conor.',
+                msg: `thank god... hi ${res.rows[0].name}.`,
               })
               .redirect('/talk')
           : response
