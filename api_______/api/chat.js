@@ -36,7 +36,8 @@ router.get('/', auth, async (request, response, next) => {
         );
     `;
   try {
-    response.status(200).json(rows[0]);
+    const { rows } = await pool.query(queryText);
+    response.status(200).json(rows);
   } catch (err) {
     console.error('(>_<) GET: api/chat/ > LOAD CHATS > catch: ' + err.message);
     return next(err);
@@ -47,23 +48,23 @@ router.get('/', auth, async (request, response, next) => {
 //  ==   POST   ==
 //  ==============
 
-//  LOGIN
+//  POST CHAT
 //  @route      POST api/chat/
-//  @desc       LOGIN-AUTH User | GET Token
+//  @desc       AUTH User | POST Chat
 //  @access     PRIVATE
 router.post('/', auth, async (request, response, next) => {
   console.log('(^=^) GET: api/chat/ > POST CHAT >  Enter FXN');
   const { id, talkId, body } = request.body;
   const queryText = `
-      INSERT (body, send_id)
-      VALUES (${body}, ${id}) 
-      INTO tbl_talk_history
-      WHERE talk_id = ${talkId}
+      INSERT INTO tbl_talk_history(body, talk_id, send_id)
+      VALUES($1, $2, $3) 
+      RETURNING body, date_time;
       `;
   try {
-    response.status(200).json(rows[0]);
+    const { rows } = await pool.query(queryText, [body, talkId, id]);
+    response.status(200).json(rows);
   } catch (err) {
-    console.error('(>_<) GET: api/chat/ > LOAD CHATS > catch: ' + err.message);
+    console.error('(>_<) GET: api/chat/ > POST CHAT > catch: ' + err.message);
     return next(err);
   }
 });

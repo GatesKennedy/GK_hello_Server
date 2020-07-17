@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
-const shhh = process.env.JWTSHHH;
+const { json } = require('express');
+const shhh = process.env.JWT_SHHH;
 
 module.exports = function (req, res, next) {
+  console.log('authenticate user > enter fxn');
   //  Get token from header
   const token = req.header('x-auth-token');
 
@@ -15,10 +17,16 @@ module.exports = function (req, res, next) {
   try {
     const decoded = jwt.verify(token, shhh);
     req.user = decoded.user;
+    // console.log('**** decoded.user: ', decoded.user);
+    // console.log('**** req.user:     ', req.user);
     next();
   } catch (err) {
+    // const reqUser = JSON.stringify(req.user);
+    // const decUser = JSON.stringify(decoded.user);
+    // console.log('reqUser: ', reqUser);
+    // console.log('decUser: ', decUser);
     res.status(401).json({
-      msg: 'Token is not valid',
+      msg: 'Token is not valid ',
     });
   }
 };
