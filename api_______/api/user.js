@@ -164,10 +164,10 @@ router.post(
     if (!errors.isEmpty()) {
       return response.status(400).json({ errors: errors.array() });
     }
-
+    //  No More Admin
     const { username, email, password, role } = request.body;
     if (role === 'admin') {
-      response.json({ hack: true, msg: 'I love you... do you?' });
+      return response.json({ hack: true, msg: 'I love you... do you?' });
     }
     //  Async db Connection
     const client = await pool.connect();
@@ -197,11 +197,12 @@ router.post(
       const userId = resUser.rows[0].id;
       console.log('>INSERT\n', resUser.rows[0]);
       if (role === 'user') {
+        const conorId = '4b05a790-79e9-4b5d-831a-55061620b9cc';
         //  Create Chat
         const chatText = `
-      INSERT INTO tbl_talk(type)
-      VALUES($1)
-      RETURNING id;
+            INSERT INTO tbl_talk(type)
+            VALUES($1)
+            RETURNING id;
       `;
         const resChat = await client.query(chatText, ['chat']);
         const chatId = resChat.rows[0].id;
@@ -209,24 +210,26 @@ router.post(
 
         //  Create Access
         const accessText = `
-      INSERT INTO tbl_access(user_id, talk_id)
-      VALUES($1, $2);
+            INSERT INTO tbl_access(user_id, talk_id)
+            VALUES
+                ($1, $2),
+                ($3, $2);
       `;
-        await client.query(accessText, [userId, chatId]);
+        await client.query(accessText, [userId, chatId, conorId]);
         console.log('>ACCESS');
 
         //  Create History
         const initText = `
-      INSERT INTO tbl_talk_history(talk_id, send_id, body, edit_note)
-      VALUES($1, $2, $3, $4)
-      RETURNING date_edit, edit_note;
+            INSERT INTO tbl_talk_history(talk_id, send_id, body, edit_note)
+            VALUES($1, $2, $3, $4)
+            RETURNING date_time, edit_note;
       `;
+        //  timestamp: 2020-07-17 05:17:13.484683-07
         const body = {
           type: 'chat',
           text: `Hello ${username}, <br> Glad you could make it. (^=^)`,
         };
 
-        const conorId = '3b65075b-e334-46f7-bb1d-8a6bdbffcaa3';
         const resInit = await client.query(initText, [
           chatId,
           conorId,
@@ -269,7 +272,6 @@ router.post(
       //  Finally
       client.release();
     }
-    //  Redirect to /talk
   }
 );
 

@@ -44,10 +44,10 @@ CREATE TABLE IF NOT EXISTS tbl_profile(
 );
 CREATE TABLE IF NOT EXISTS tbl_prof_history(
     id          SERIAL,
-    user_id     UUID        REFERENCES tbl_user(id) NOT NULL,
-    field       field_type  NOT NULL, 
-    body        TEXT        NOT NULL DEFAULT 'void',
-    date_edit   DATE        NOT NULL DEFAULT CURRENT_DATE,
+    user_id     UUID            REFERENCES tbl_user(id) NOT NULL,
+    field       field_type      NOT NULL, 
+    body        TEXT            NOT NULL DEFAULT 'void',
+    date_time   TIMESTAMPtz     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
 
@@ -60,12 +60,12 @@ CREATE TABLE IF NOT EXISTS tbl_talk(
 );
 CREATE TABLE IF NOT EXISTS tbl_talk_history(
     id          SERIAL,
-    talk_id     UUID        REFERENCES tbl_talk(id) NOT NULL,  --  INDEX
-    send_id     UUID        REFERENCES tbl_user(id) NOT NULL,  --  INDEX
-    body        JSONB       NOT NULL,                          --  INDEX
-    seen        BOOLEAN     NOT NULL DEFAULT true,
-    date_edit   DATE        NOT NULL DEFAULT CURRENT_DATE,      
-    edit_note   TEXT        NOT NULL DEFAULT 'NO_ENTRY',        --(-_-)--
+    talk_id     UUID            REFERENCES tbl_talk(id) NOT NULL,  --  INDEX
+    send_id     UUID            REFERENCES tbl_user(id) NOT NULL,  --  INDEX
+    body        JSONB           NOT NULL,                          --  INDEX
+    seen        BOOLEAN         NOT NULL DEFAULT true,
+    date_time   TIMESTAMPtz     NOT NULL DEFAULT CURRENT_TIMESTAMP,      
+    edit_note   TEXT            NOT NULL DEFAULT 'NO_ENTRY',        --(-_-)--
     PRIMARY KEY (id)
 );
 CREATE TABLE IF NOT EXISTS tbl_access(
