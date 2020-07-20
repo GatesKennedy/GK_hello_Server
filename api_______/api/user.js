@@ -39,6 +39,8 @@ router.get('/', auth, async (request, response, next) => {
       WHERE u.id=($1)`;
   try {
     const { rows } = await pool.query(queryText, [request.user.id]);
+    console.log('Load Auth User > req.user.id: ', request.user.id);
+    console.log('Load Auth User > res.rows: ', rows);
 
     response.status(200).json(rows[0]);
   } catch (err) {
@@ -81,10 +83,9 @@ router.post(
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      //  Check Email exists
+      //  Check Email
       const queryText = 'SELECT * FROM tbl_user WHERE email = ($1)';
       const res = await client.query(queryText, [email]);
-      //  Error Res
       if (!res.rows.length > 0) {
         return response
           .status(400)
@@ -94,7 +95,6 @@ router.post(
 
       //  Check Password
       const isMatch = await bcrypt.compare(password, res.rows[0].password);
-      //  Error Res
       if (!isMatch) {
         return response
           .status(400)
@@ -112,8 +112,7 @@ router.post(
       console.log('(o_O) LOGIN USER > AuthUser ID = ' + userId);
       jwt.sign(payload, shhh, { expiresIn: 18000 }, (err, token) => {
         if (err) throw err;
-        const tokenLoad = JSON.stringify(token);
-        console.log('(o_O) LOGIN USER > tokenLoad: ' + tokenLoad);
+        console.log('(o_O) LOGIN USER > tokenLoad: ', token);
         res.rows[0].role === 'admin'
           ? response
               .json({
@@ -200,6 +199,13 @@ router.post(
       const userValues = [username, email, pwCrypt, role];
       const resUser = await client.query(userText, userValues);
       const userId = resUser.rows[0].id;
+      //  Create Profile
+      const profText = `
+       INSERT INTO tbl_profile(user_id) 
+       VALUES($1) `;
+      const profValues = [userId];
+      const resProf = await client.query(profText, profValues);
+
       console.log('>INSERT\n', resUser.rows[0]);
       if (role === 'user') {
         const conorId = '4b05a790-79e9-4b5d-831a-55061620b9cc';
