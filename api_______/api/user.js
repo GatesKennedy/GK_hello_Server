@@ -69,7 +69,11 @@ router.post(
     //  Validation Error Response
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      return response.status(400).json({ errors: errors.array() });
+      console.log('fail validation: ', errors);
+      return response.status(400).json({
+        errors: errors.array(),
+        valid: false,
+      });
     }
     console.log('(o_O) LOGIN USER > validation: PASS');
 
@@ -162,6 +166,7 @@ router.post(
     //  Error Response
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
+      console.log('fail validation: ', errors);
       return response.status(400).json({ errors: errors.array() });
     }
     //  No More Admin
