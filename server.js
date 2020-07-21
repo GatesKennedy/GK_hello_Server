@@ -3,14 +3,14 @@ const express = require('express');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const { AWS_FILE_SIZE } = process.env;
-
 //  APIs
 const test = require('./api_______/test');
 const user = require('./api_______/api/user');
 const chat = require('./api_______/api/chat');
 const note = require('./api_______/api/note');
 const aws = require('./aws_______/api/action');
-
+//  Socket.io
+const io = require('socket.io')(5555);
 //~~~~~~~~~~~~~~~~~~~~~~~
 //  Init EXPRESS variable
 const serv = express();
@@ -20,6 +20,11 @@ console.log('~~~~~ server.js ~~~~~');
 serv.listen(PORT, () =>
   console.log(`(^=^)  GOOD: Server listening on port ${PORT}`)
 );
+//~~~~~~~~~~~~~~~~~~~~~~~
+//    Socket.id
+io.on('connection', (socket) => {
+  socket.emit('chat-message', "oh hi, it's great to see you here.");
+});
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    Init MIDDLEWARE
