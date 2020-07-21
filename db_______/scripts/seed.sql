@@ -85,6 +85,13 @@ CREATE INDEX idx_genre       ON tbl_access                   (user_id);
 --~~~~~~~~~~~~~~~~~~~~~~
 --      UPDATE
 
+-- UPDATE tbl_user
+-- SET role = 'admin'
+-- WHERE name = 'Conor';
+
+--~~~~~~~~~~~~~~~~~
+--      INSERT
+
 --~~~~~~~~~~~~~~~~~
 --      VIEW
 

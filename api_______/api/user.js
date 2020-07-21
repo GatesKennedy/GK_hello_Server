@@ -198,6 +198,7 @@ router.post(
         RETURNING id, name, role`;
       const userValues = [username, email, pwCrypt, role];
       const resUser = await client.query(userText, userValues);
+      console.log('>INSERT\n', resUser.rows[0]);
       const userId = resUser.rows[0].id;
       //  Create Profile
       const profText = `
@@ -205,10 +206,18 @@ router.post(
        VALUES($1) `;
       const profValues = [userId];
       const resProf = await client.query(profText, profValues);
+      //  Get Admin
+      const adminText = `
+        SELECT id
+        FROM tbl_user
+        WHERE role = 'admin'
+          AND name = 'Conor';
+      `;
+      const resAdmin = await client.query(adminText);
 
-      console.log('>INSERT\n', resUser.rows[0]);
       if (role === 'user') {
-        const conorId = '4b05a790-79e9-4b5d-831a-55061620b9cc';
+        const conorId = resAdmin.rows[0].id;
+        console.log('>conorId: ', conorId);
         //  Create Chat
         const chatText = `
             INSERT INTO tbl_talk(type)
@@ -289,7 +298,8 @@ router.post(
 //-----------------------------------------------------------------
 //  Catch-All Error Function
 router.use((err, req, res, next) => {
-  res.json(err);
+  console.log('ENTER NEXT ERR FXN');
+  res.status(500).json(err);
 });
 
 module.exports = router;
