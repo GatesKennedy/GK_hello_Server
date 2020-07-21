@@ -91,7 +91,10 @@ CREATE INDEX idx_genre       ON tbl_access                   (user_id);
 
 --~~~~~~~~~~~~~~~~~
 --      INSERT
-
+INSERT INTO tbl_user(name, email, password, role)
+VALUES 
+    ('Conor', 'conor@gateskennedy.com', '$2a$10$2LtFlrWeLZgCPGD4fIz0zeYHh4wDv2hrD7kjoc7nv0E3GntXMa7pa', 'admin')
+    ;
 --~~~~~~~~~~~~~~~~~
 --      VIEW
 
