@@ -4,11 +4,11 @@ const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const { AWS_FILE_SIZE } = process.env;
 //  APIs
-const test = require('./api_______/test');
 const user = require('./api_______/api/user');
 const chat = require('./api_______/api/chat');
 const note = require('./api_______/api/note');
 const aws = require('./aws_______/api/action');
+const test = require('./api_______/test');
 //  Socket.io
 const io = require('socket.io')(5555);
 //~~~~~~~~~~~~~~~~~~~~~~~
