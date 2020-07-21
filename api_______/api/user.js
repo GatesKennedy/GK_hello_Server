@@ -87,6 +87,7 @@ router.post(
       const queryText = 'SELECT * FROM tbl_user WHERE email = ($1)';
       const res = await client.query(queryText, [email]);
       if (!res.rows.length > 0) {
+        console.log('(o_O) LOGIN USER > NO Email : FAIL');
         return response
           .status(400)
           .json({ errors: [{ msg: 'Invalid Credentials' }] });
@@ -96,6 +97,7 @@ router.post(
       //  Check Password
       const isMatch = await bcrypt.compare(password, res.rows[0].password);
       if (!isMatch) {
+        console.log('(o_O) LOGIN USER > NO Password : FAIL');
         return response
           .status(400)
           .json({ errors: [{ msg: 'Invalid Credentials' }] });
@@ -276,11 +278,14 @@ router.post(
       };
       jwt.sign(payload, shhh, { expiresIn: 1800 }, (err, token) => {
         if (err) throw err;
-        response.json({ token: token, userName: username }).redirect('/talk');
+        response
+          .json({ token: token, user: { userName: username } })
+          .redirect('/talk');
       });
       console.log('>JWT');
       await client.query('COMMIT');
       console.log('(^=^) REGISTER USER > DONE');
+      //~~~~~~~~~~~~~~~~~~~~~
     } catch (err) {
       //  Catch
       await client.query('ROLLBACK');
@@ -298,7 +303,7 @@ router.post(
 //-----------------------------------------------------------------
 //  Catch-All Error Function
 router.use((err, req, res, next) => {
-  console.log('ENTER NEXT ERR FXN');
+  console.log('User.js > ENTER NEXT ERR FXN > err:\n', err);
   res.status(500).json(err);
 });
 
