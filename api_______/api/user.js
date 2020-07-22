@@ -179,7 +179,8 @@ router.post(
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      //  Check Email exists
+      //~~~~~~~~~~~~~~~~~~~~~~~~~
+      //  @ EMAIL
       const queryText = 'SELECT name FROM tbl_user WHERE email = ($1)';
       const { rows } = await client.query(queryText, [email]);
       if (rows.length > 0) {
@@ -188,36 +189,40 @@ router.post(
           .json({ errors: [{ msg: 'User already exists' }] });
       }
       console.log('>Email');
-      //  Encrypt User Password
+      //~~~~~~~~~~~~~~~~~~~~~~~~~
+      //  @ PASSWORD
       const salt = await bcrypt.genSalt(10);
       const pwCrypt = await bcrypt.hash(password, salt);
       console.log('>Password');
+      //  Get Admin
+      const adminText = `
+        SELECT id
+        FROM tbl_user
+        WHERE role = 'admin';
+      `;
+      const resAdmin = await client.query(adminText);
+      let dynRole = 'user';
+      if (resAdmin.rows.length < 1) dynRole = 'admin';
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Create User
+
       const userText = `
         INSERT INTO tbl_user(name, email, password, role) 
         VALUES($1, $2, $3, $4) 
         RETURNING id, name, role`;
-      const userValues = [username, email, pwCrypt, role];
+      const userValues = [username, email, pwCrypt, dynRole];
       const resUser = await client.query(userText, userValues);
       console.log('>INSERT\n', resUser.rows[0]);
       const userId = resUser.rows[0].id;
+      //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Create Profile
       const profText = `
        INSERT INTO tbl_profile(user_id) 
        VALUES($1) `;
       const profValues = [userId];
       const resProf = await client.query(profText, profValues);
-      //  Get Admin
-      const adminText = `
-        SELECT id
-        FROM tbl_user
-        WHERE role = 'admin'
-          AND name = 'Conor';
-      `;
-      const resAdmin = await client.query(adminText);
 
-      if (role === 'user') {
+      if (resAdmin.rows.length > 0) {
         const conorId = resAdmin.rows[0].id;
         console.log('>conorId: ', conorId);
         //  Create Chat
@@ -249,7 +254,7 @@ router.post(
         //  timestamp: 2020-07-17 05:17:13.484683-07
         const body = {
           type: 'chat',
-          text: `Hello ${username}, <br> Glad you could make it. (^=^)`,
+          text: `Hello ${username}, glad you could make it. (^=^)`,
         };
 
         const resInit = await client.query(initText, [
