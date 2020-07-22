@@ -304,7 +304,7 @@ router.post(
 //============================================================
 
 //  TEST ROUTE NO DB
-//  @route      GET api/test
+//  @route      GET api/user/sars
 //  @desc       respond "Oh, hello there."
 //  @access     PUBLIC
 router.get('/sars', async (request, response, next) => {
@@ -314,7 +314,7 @@ router.get('/sars', async (request, response, next) => {
 });
 
 //  TEST ROUTE with DB
-//  @route      GET api/test
+//  @route      GET api/user/db
 //  @desc       respond "list of all artists"
 //  @access     PUBLIC
 router.get('/db', async (request, response, next) => {
