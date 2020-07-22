@@ -1,9 +1,9 @@
 //  EXPRESS
 const express = require('express');
-const router = express.Router();
 //  MID
-// const pool = require('../nds_db/db');
+const pool = require('../db_______/db');
 
+const router = express.Router();
 //  =============
 //  ==   GET   ==
 //  =============
