@@ -12,6 +12,53 @@ const shhh = process.env.JWT_SHHH;
 
 const router = express.Router();
 
+//  AUTH USER
+//  @route      GET api/auth
+//  @desc       AUTH Token | AUTH User
+//  @access     PRIVATE
+router.get('/', auth, async (request, response, next) => {
+  console.log('(^=^) LOAD USER > GET: api/auth/ > Enter FXN');
+  const queryText = `
+      SELECT 
+        id, 
+        role
+      FROM tbl_user 
+      WHERE id=($1)`;
+  try {
+    const { rows } = await pool.query(queryText, [request.user.id]);
+
+    if (rows.length === 1) {
+      const { id, role } = rows[0];
+      //~~~~~~~~~~~~~~~~~~~~~~~~~
+      //  Return JWT
+      const payload = {
+        user: {
+          id: id,
+        },
+      };
+      jwt.sign(payload, shhh, { expiresIn: 18000 }, (err, token) => {
+        if (err) throw err;
+        role === 'admin'
+          ? response.json({
+              token: token,
+              role: role,
+              msg: `thank god... hi ${name}.`,
+            })
+          : response.json({
+              token: token,
+              role: role,
+              msg: 'void',
+            });
+      });
+    } else if (rows[0].length < 1) {
+      throw 'This User cannot be found';
+    } else throw 'There was an error finding this User';
+  } catch (err) {
+    console.error('(._.) auth.js > GET AUTH > catch: ', err);
+    return next(err);
+  }
+});
+
 //  ==============
 //  ==   POST   ==
 //  ==============
