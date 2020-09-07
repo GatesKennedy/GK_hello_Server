@@ -1,5 +1,5 @@
 --  DATABASE    OWNER       ENCODING
---  db_chat     ohnodamn    utf8
+--  db_hello     ohnodamn    utf8
 --88888888 88888888 88888888 88888888 88888888 88888888 88888888 88888888 
 
 DROP TABLE IF EXISTS tbl_user           CASCADE;      -- 4
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS tbl_user(
     PRIMARY KEY (id)
 );
 CREATE TABLE IF NOT EXISTS tbl_profile(
-    user_id         UUID            REFERENCES tbl_user(id) NOT NULL,
+    user_id         UUID            REFERENCES tbl_user(id) ON DELETE CASCADE,
     entity          entity_type     NOT NULL DEFAULT 'void',
     website         VARCHAR(128),
     thought         VARCHAR,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS tbl_profile(
 );
 CREATE TABLE IF NOT EXISTS tbl_prof_history(
     id          SERIAL,
-    user_id     UUID            REFERENCES tbl_user(id) NOT NULL,
+    user_id     UUID            REFERENCES tbl_user(id) ON DELETE CASCADE,
     field       field_type      NOT NULL, 
     body        TEXT            NOT NULL DEFAULT 'void',
     date_time   TIMESTAMPtz     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -60,8 +60,8 @@ CREATE TABLE IF NOT EXISTS tbl_talk(
 );
 CREATE TABLE IF NOT EXISTS tbl_talk_history(
     id          SERIAL,
-    talk_id     UUID            REFERENCES tbl_talk(id) NOT NULL,  --  INDEX
-    send_id     UUID            REFERENCES tbl_user(id) NOT NULL,  --  INDEX
+    talk_id     UUID            REFERENCES tbl_talk(id) ON DELETE CASCADE,  --  INDEX
+    send_id     UUID            REFERENCES tbl_user(id) ON DELETE SET NULL,  --  INDEX
     body        JSONB           NOT NULL,                          --  INDEX
     seen        BOOLEAN         NOT NULL DEFAULT true,
     date_time   TIMESTAMPtz     NOT NULL DEFAULT CURRENT_TIMESTAMP,      
@@ -69,8 +69,8 @@ CREATE TABLE IF NOT EXISTS tbl_talk_history(
     PRIMARY KEY (id)
 );
 CREATE TABLE IF NOT EXISTS tbl_access(
-    user_id     UUID        REFERENCES tbl_user(id) NOT NULL,   --  INDEX
-    talk_id     UUID        REFERENCES tbl_talk(id) NOT NULL,
+    user_id     UUID        REFERENCES tbl_user(id) ON DELETE SET NULL,   --  INDEX
+    talk_id     UUID        REFERENCES tbl_talk(id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, talk_id)
 );
 
@@ -102,8 +102,8 @@ VALUES
 --  .sql Script from CMD
 --===============================
 --  psql -U user_name -d db_name -a -f <file_path>
---  psql -U ohnodamn -d db_talk -f C:\Programming\Gates_Kennedy\GK_hello\GK_hello_Server\db_______\scripts\seed.sql
+--  psql -U ohnodamn -d db_hello -f C:\Programming\Gates_Kennedy\GK_hello\GK_hello_Server\db_______\scripts\seed_hello.sql
 --  ~Heroku~
 --  Not Connected to Heroku psql:
 --      cat <file_name> | heroku pg:psql
---      cat C:\Programming\Gates_Kennedy\GK_hello\GK_hello_Server\db_______\scripts\seed.sql | heroku pg:psql
+--      cat C:\Programming\Gates_Kennedy\GK_hello\GK_hello_Server\db_______\scripts\seed_hello.sql | heroku pg:psql
