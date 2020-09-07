@@ -23,15 +23,15 @@ const router = express.Router();
 router.post(
   '/login',
   [
-    check('email', 'Please include a valid email').isEmail(),
-    check('password', 'Password is required').exists(),
+    check('emailIn', 'Please include a valid email').isEmail(),
+    check('passwordIn', 'Password is required').exists(),
   ],
   async (request, response, next) => {
     console.log('(^=^) LOGIN USER > POST: api/auth/ > Enter FXN');
     console.log('(o_O) LOGIN USER > request.body: \n', request.body);
-    const { email, password } = request.body;
-    const emailLower = email.toLowerCase();
-    console.log('|      user values: ', { emailLower, password });
+    const { emailIn, passwordIn } = request.body;
+    const emailLower = emailIn.toLowerCase();
+    console.log('|      user values: ', { emailLower, passwordIn });
     //~~~~~~~~~~~~~~~~~~~~~~~~~
     //  Validation Error Response
     const errors = validationResult(request);
@@ -51,7 +51,8 @@ router.post(
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Check Email
       const queryText = `
-        SELECT 
+        SELECT
+            id,
             name,
             email,
             password,
@@ -59,14 +60,15 @@ router.post(
         FROM tbl_user 
         WHERE LOWER(email) = ($1)
         `;
-      // WHERE email = LOWER($1)
-      const res = await client.query(queryText, [emailLower]);
+
+      const { rows } = await client.query(queryText, [emailLower]);
       console.log(
         `(o_O) LOGIN USER > Query Response:
       |     User: `,
-        res.rows[0]
+        rows[0]
       );
-      if (!res.rows.length > 0) {
+      const { id, name, email, password, role } = rows[0];
+      if (!rows.length > 0) {
         console.log('(o_O) LOGIN USER > NO Email : FAIL');
         return response
           .status(400)
@@ -76,14 +78,9 @@ router.post(
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Check Password
-      const isMatch = await bcrypt.compare(password, res.rows[0].password);
+      const isMatch = await bcrypt.compare(passwordIn, password);
       if (!isMatch) {
         console.log('(o_O) LOGIN USER > NO Password : FAIL');
-        console.log('|      isMatch: ', isMatch);
-        console.log('|      password: ', password);
-        console.log('|      res.rows: ', res.rows);
-        console.log('|      res.rows[0]: ', res.rows[0]);
-        console.log('|      res.rows[0].password: ', res.rows[0].password);
         return response
           .status(400)
           .json({ errors: [{ msg: 'Invalid Credentials' }] });
@@ -91,29 +88,30 @@ router.post(
       console.log('(o_O) LOGIN USER > Password Matches: PASS');
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Return JWT
-      const userId = res.rows[0].id;
       const payload = {
         user: {
-          id: userId,
+          id: id,
         },
       };
-      console.log('(o_O) LOGIN USER > AuthUser ID = ' + userId);
+      console.log('(o_O) LOGIN USER > AuthUser ID = ', id);
       jwt.sign(payload, shhh, { expiresIn: 18000 }, (err, token) => {
         if (err) throw err;
         console.log('(o_O) LOGIN USER > tokenLoad: ', token);
-        res.rows[0].role === 'admin'
+        role === 'admin'
           ? response
               .json({
                 token: token,
-                username: res.rows[0].name,
-                msg: `thank god... hi ${res.rows[0].name}.`,
+                username: name,
+                role: role,
+                msg: `thank god... hi ${name}.`,
               })
               .redirect('/talk')
           : response
               .json({
                 token: token,
-                username: res.rows[0].name,
-                msg: 'oh cool. welcome back',
+                username: name,
+                role: role,
+                msg: `oh cool. welcome back ${name}`,
               })
               .redirect('/talk');
       });
