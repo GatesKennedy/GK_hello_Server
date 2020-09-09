@@ -9,7 +9,7 @@ const user = require('./api_______/api/user');
 const chat = require('./api_______/api/chat');
 const note = require('./api_______/api/note');
 const aws = require('./aws_______/api/action');
-const test = require('./api_______/test');
+// const test = require('./api_______/test');
 //  Socket.io
 const io = require('socket.io')(5555);
 //~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,7 +79,7 @@ serv.use('/api/user', user);
 serv.use('/api/chat', chat);
 serv.use('/api/note', note);
 serv.use('/api/aws', aws);
-serv.use('/api/test', test);
+// serv.use('/api/test', test);
 
 // MIDDLEWARE   error handling
 serv.use((err, req, res, next) => {
