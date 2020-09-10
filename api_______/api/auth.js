@@ -75,18 +75,21 @@ router.post(
   ],
   async (request, response, next) => {
     console.log('(^=^) LOGIN USER > POST: api/auth/ > Enter FXN');
-    console.log('(o_O) LOGIN USER > request.body: \n', request.body);
+    // console.log('(o_O) LOGIN USER > request.body: \n', request.body);
     const { emailIn, passwordIn } = request.body;
     const emailLower = emailIn.toLowerCase();
     console.log('|      user values: ', { emailLower, passwordIn });
+    console.log('=========== begin processing');
     //~~~~~~~~~~~~~~~~~~~~~~~~~
     //  Validation Error Response
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      console.log('fail validation: ', errors);
+      console.log('(>_<) fail validation > errors: ', errors);
+      console.log('(>_<) fail validation > errors.array() ', errors.array());
       return response.status(400).json({
         errors: errors.array(),
         valid: false,
+        msg: `oh no.. field validation error`,
       });
     }
     console.log('(o_O) LOGIN USER > validation: PASS');
@@ -109,17 +112,18 @@ router.post(
         `;
 
       const { rows } = await client.query(queryText, [emailLower]);
-      console.log(
-        `(o_O) LOGIN USER > Query Response:
-      |     User: `,
-        rows[0]
-      );
+      // console.log(
+      //   `(o_O) LOGIN USER > Query Response:
+      // |     User: `,
+      //   rows[0]
+      // );
       const { id, name, email, password, role } = rows[0];
       if (!rows.length > 0) {
-        console.log('(o_O) LOGIN USER > NO Email : FAIL');
-        return response
-          .status(400)
-          .json({ errors: [{ msg: 'Invalid Credentials' }] });
+        console.log('(>_<) LOGIN USER > NO Email : FAIL');
+        return response.status(400).json({
+          errors: [{ msg: 'oopsie: email not found' }],
+          msg: 'msg: email not found...',
+        });
       }
       console.log('(o_O) LOGIN USER > Email Exists: PASS');
 
@@ -127,10 +131,11 @@ router.post(
       //  Check Password
       const isMatch = await bcrypt.compare(passwordIn, password);
       if (!isMatch) {
-        console.log('(o_O) LOGIN USER > NO Password : FAIL');
-        return response
-          .status(400)
-          .json({ errors: [{ msg: 'Invalid Credentials' }] });
+        console.log('(>_<) LOGIN USER > NO Password : FAIL');
+        return response.status(400).json({
+          errors: [{ msg: 'oopsie: wrong password' }],
+          msg: 'msg: wrong password',
+        });
       }
       console.log('(o_O) LOGIN USER > Password Matches: PASS');
       //~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -172,6 +177,15 @@ router.post(
     } catch (err) {
       console.log('(>_<) LOGIN USER > FAIL Catch Err: ' + err.message);
       await client.query('ROLLBACK');
+      response.json({
+        errors: [
+          {
+            msg: `oopsie: email not found : 
+        ${errors.array()}`,
+          },
+        ],
+        msg: `oh no... an error occured`,
+      });
       return next(err);
     } finally {
       client.release();
