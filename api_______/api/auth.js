@@ -212,11 +212,13 @@ router.post(
     //  Error Response
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      console.log('fail validation: ', errors);
+      console.log('(>_<) fail validation > errors: ', errors);
       return response.status(400).json({ errors: errors.array() });
     }
-    //  No More Admin
     const { username, email, password, role } = request.body;
+    const emailLow = email.toLowerCase();
+    //  No More Admin
+    console.log('(>_<) fail No More Admin > errors: ', errors);
     if (role === 'admin') {
       return response.json({ hack: true, msg: 'I love you... do you?' });
     }
@@ -226,12 +228,17 @@ router.post(
       await client.query('BEGIN');
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  @ EMAIL
-      const queryText = 'SELECT name FROM tbl_user WHERE email = ($1)';
-      const { rows } = await client.query(queryText, [email]);
+      const queryText = `
+        SELECT name 
+        FROM tbl_user  
+        WHERE LOWER(email) = ($1)
+        `;
+      const { rows } = await client.query(queryText, [emailLow]);
       if (rows.length > 0) {
         return response
           .status(400)
           .json({ errors: [{ msg: 'User already exists' }] });
+        //  !!! error response !!!
       }
       console.log('>Email');
       //~~~~~~~~~~~~~~~~~~~~~~~~~
