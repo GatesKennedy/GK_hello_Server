@@ -68,8 +68,19 @@ serv.use(
 );
 
 //~~~~~~~~~~~~~~~~~~~~~~~
-//    LOGS
-//console.log('server.js > Environment Variables: \n', process.env);
+//    Classes
+
+class AppError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+
+    this.statusCode = statusCode;
+    this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
+    this.isOperational = true;
+
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    API Routes
@@ -82,16 +93,7 @@ serv.use('/api/aws', aws);
 // serv.use('/api/test', test);
 
 serv.all('*', (req, res, next) => {
-  // res.status(404).json({
-  //   status: 'fail',
-  //   message: `Oops.. ${req.originalUrl} is not for you!`,
-  // });
-
-  const err = new Error(`Oops.. ${req.originalUrl} is not for you!`);
-  err.status = 'fail';
-  err.statusCode = 404;
-
-  next(err);
+  next(new AppError(`Oops.. ${req.originalUrl} is not for you!`, 404));
 });
 
 // MIDDLEWARE   error handling
