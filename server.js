@@ -81,6 +81,13 @@ serv.use('/api/note', note);
 serv.use('/api/aws', aws);
 // serv.use('/api/test', test);
 
+serv.all('*', (req, res, next) => {
+  res.status(404).json({
+    status: 'fail',
+    message: `Oops.. ${req.originalUrl} is not for you!`,
+  });
+});
+
 // MIDDLEWARE   error handling
 serv.use((err, req, res, next) => {
   res.json(err);
