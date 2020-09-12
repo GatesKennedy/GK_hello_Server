@@ -1,39 +1,66 @@
-//  Express
-const express = require('express');
-const cors = require('cors');
-const fileUpload = require('express-fileupload');
-const { AWS_FILE_SIZE } = process.env;
-//  APIs
-const auth = require('./api_______/api/auth');
-const user = require('./api_______/api/user');
-const chat = require('./api_______/api/chat');
-const note = require('./api_______/api/note');
-const aws = require('./aws_______/api/action');
-// const test = require('./api_______/test');
-//  Socket.io
-const io = require('socket.io')(5555);
 //~~~~~~~~~~~~~~~~~~~~~~~
-//  Init EXPRESS variable
+//    Classes
+//~~~~~~~~~~~~~~~~~~~~~~~
+
+class AppError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+
+    this.statusCode = statusCode;
+    this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
+    this.isOperational = true;
+
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~
+//    EXPRESS
+//~~~~~~~~~~~~~~~~~~~~~~~
+
+//  import
+const express = require('express');
+//  init
 const serv = express();
 const PORT = process.env.PORT || 5000;
-//  log on connect
 console.log('~~~~~ server.js ~~~~~');
 serv.listen(PORT, () =>
   console.log(`(^=^)  GOOD: Server listening on port ${PORT}`)
 );
+
 //~~~~~~~~~~~~~~~~~~~~~~~
-//    Socket.id
+//    Socket.io
+//~~~~~~~~~~~~~~~~~~~~~~~
+
+//  import
+const io = require('socket.io')(5555);
+//  init
 io.on('connection', (socket) => {
   socket.emit('chat-message', "oh hi, it's great to see you here.");
 });
 
 //~~~~~~~~~~~~~~~~~~~~~~~
-//    Init MIDDLEWARE
+//    MIDDLEWARE
+//~~~~~~~~~~~~~~~~~~~~~~~
 
-//  Express bodyParser
+//  import
+const cors = require('cors');
+const fileUpload = require('express-fileupload');
+const { AWS_FILE_SIZE } = process.env;
+//  init
 serv.use(express.json({ extended: false }));
 serv.use(express.urlencoded({ extended: true }));
-// //  CORS
+serv.use(
+  fileUpload({
+    createParentPath: true,
+    useTempFiles: true,
+    tempFileDir: '/temp/',
+    limits: AWS_FILE_SIZE,
+    safeFileNames: true,
+    preserveExtension: true,
+  })
+);
+serv.use(cors());
 // let whitelist = [
 //   process.env.CLIENT_ORIGIN_DEV,
 //   process.env.CLIENT_ORIGIN_STAGE,
@@ -53,50 +80,37 @@ serv.use(express.urlencoded({ extended: true }));
 // };
 // serv.options('/api/aws', cors(corsOptions)); // include before other routes
 // serv.use(cors(corsOptions));
-serv.use(cors());
-
-//  Express-fileupload
-serv.use(
-  fileUpload({
-    createParentPath: true,
-    useTempFiles: true,
-    tempFileDir: '/temp/',
-    limits: AWS_FILE_SIZE,
-    safeFileNames: true,
-    preserveExtension: true,
-  })
-);
 
 //~~~~~~~~~~~~~~~~~~~~~~~
-//    Classes
-
-class AppError extends Error {
-  constructor(message, statusCode) {
-    super(message);
-
-    this.statusCode = statusCode;
-    this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
-    this.isOperational = true;
-
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
-
+//      ROUTES
 //~~~~~~~~~~~~~~~~~~~~~~~
-//    API Routes
-//  _utils
+
+//  import
+const auth = require('./api_______/api/auth');
+const user = require('./api_______/api/user');
+const chat = require('./api_______/api/chat');
+const note = require('./api_______/api/note');
+const aws = require('./aws_______/api/action');
+//  init
 serv.use('/api/auth', auth);
 serv.use('/api/user', user);
 serv.use('/api/chat', chat);
 serv.use('/api/note', note);
 serv.use('/api/aws', aws);
-// serv.use('/api/test', test);
-
 serv.all('*', (req, res, next) => {
   next(new AppError(`Oops.. ${req.originalUrl} is not for you!`, 404));
 });
 
-// MIDDLEWARE   error handling
+//~~~~~~~~~~~~~~~~~~~~~~~
+//  ERROR HANDLING
+//~~~~~~~~~~~~~~~~~~~~~~~
+
+//  import
+const {
+  sendErrorDev,
+  sendErrorProd,
+} = require('./api_______/middleware/errorGen');
+//  init
 serv.use((err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'Oops.. error';
@@ -106,11 +120,6 @@ serv.use((err, req, res, next) => {
   } else if (process.env.NODE_ENV === 'production') {
     sendErrorProd(err, res);
   }
-
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-  });
 });
 
 module.exports = serv;

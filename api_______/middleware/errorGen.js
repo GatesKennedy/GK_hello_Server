@@ -1,4 +1,3 @@
-const serv = require('serv');
 const { json } = require('express');
 
 // serv.use(err, req, res, next) => {
@@ -29,17 +28,8 @@ const sendErrorProd = (err, res) => {
   });
 };
 
-//   module.exports = (err, req, res, next) => {
-//     err.statusCode = err.statusCode || 500;
-//     err.status = err.status || 'error';
-
-//     if (process.env.NODE_ENV === 'development') {
-//       sendErrorDev(err, res);
-//     } else if (process.env.NODE_ENV === 'production') {
-//       sendErrorProd(err, res);
-//     }
-//   };
-
 module.exports = {
   catchAsync,
+  sendErrorDev,
+  sendErrorProd,
 };
