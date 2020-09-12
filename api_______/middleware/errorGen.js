@@ -22,10 +22,24 @@ const sendErrorDev = (err, res) => {
 };
 
 const sendErrorProd = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-  });
+  // Operational, trusted error: send message to client
+  if (err.isOperational) {
+    res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+    });
+
+    // Programming or other unknown error
+  } else {
+    // 1) Log error
+    console.error('ERROR 💥: ', err);
+
+    // 2) Send generic message
+    res.status(500).json({
+      status: 'error',
+      message: 'Oh no... Oh god... Damn!',
+    });
+  }
 };
 
 module.exports = {
