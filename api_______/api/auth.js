@@ -84,7 +84,7 @@ router.post(
 
     try {
       //~~~~~~~~~~~~~~~~~~~~~~~~~
-      //  Validation Error Response
+      //  Check Input
       const errors = validationResult(request);
       if (!errors.isEmpty()) {
         console.log('(>_<) FAIL Validation > errors: ', errors);
@@ -110,7 +110,7 @@ router.post(
       if (!rows.length > 0) {
         console.log('#####  |   (>_<) LOGIN USER > NO Email : FAIL');
         return response.status(400).json({
-          errors: [{ msg: 'oopsie: wrong email' }],
+          errors: [{ msg: 'oops.. wrong email' }],
           msg: 'msg: email not found...',
         });
       }
@@ -123,7 +123,7 @@ router.post(
       if (!isMatch) {
         console.log('#####  |   (>_<) LOGIN USER > NO Password : FAIL');
         return response.status(400).json({
-          errors: [{ msg: 'oopsie: wrong password' }],
+          errors: [{ msg: 'oops.. wrong password' }],
           msg: 'msg: wrong password',
         });
       }
@@ -183,7 +183,7 @@ router.post(
 router.post(
   '/register',
   [
-    check('username', 'username is required').not().isEmpty(),
+    check('username', 'ehh.. username is required').not().isEmpty(),
     check('email', 'Please include a valid email').isEmail(),
     check('password', 'Password must be at least 6 characters').isLength({
       min: 6,
@@ -191,22 +191,32 @@ router.post(
   ],
   async (request, response, next) => {
     console.log('(^=^) POST: api/auth/register > REGISTER USER > Enter FXN');
-    //  Error Response
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-      console.log('#####  |   (>_<) fail validation > errors: ', errors);
-      return response.status(400).json({ errors: errors.array() });
-    }
     const { username, email, password, role } = request.body;
     const emailLow = email.toLowerCase();
-    //  No More Admin
-    console.log('#####  |   (>_<) fail No More Admin > errors: ', errors);
-    if (role === 'admin') {
-      return response.json({ hack: true, msg: 'I love you... do you?' });
-    }
+    console.log('=========== begin processing ===========');
+    //~~~~~~~~~~~~~~~~~~~~~~~~~
     //  Async db Connection
     const client = await pool.connect();
     try {
+      //~~~~~~~~~~~~~~~~~~~~~~~~~
+      //  Check Input
+      const errors = validationResult(request);
+      if (!errors.isEmpty()) {
+        console.log('#####  |   (>_<) fail validation > errors: ', errors);
+        return response.status(422).json({
+          errors: errors.array(),
+          valid: false,
+          msg: 'form validation error',
+        });
+      }
+
+      //  No More Admin
+      console.log('#####  |   (>_<) fail No More Admin > errors: ', errors);
+      if (role === 'admin') {
+        return response
+          .status(400)
+          .json({ hack: true, valid: false, msg: 'I love you... do you?' });
+      }
       await client.query('BEGIN');
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  @ EMAIL
@@ -219,7 +229,14 @@ router.post(
       if (rows.length > 0) {
         return response
           .status(400)
-          .json({ errors: [{ msg: 'User already exists' }] });
+          .json({
+            errors: [
+              {
+                msg:
+                  'eh.. someone is using that email.. you already have an account?',
+              },
+            ],
+          });
         //  !!! error response !!!
       }
       console.log('>Email');
