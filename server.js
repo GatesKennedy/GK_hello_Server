@@ -44,10 +44,12 @@ io.on('connection', (socket) => {
 //~~~~~~~~~~~~~~~~~~~~~~~
 
 //  import
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const { AWS_FILE_SIZE } = process.env;
 //  init
+serv.use(bodyParser.json());
 serv.use(express.json({ extended: false }));
 serv.use(express.urlencoded({ extended: true }));
 serv.use(
@@ -112,6 +114,8 @@ const {
 } = require('./api_______/middleware/errorGen');
 //  init
 serv.use((err, req, res, next) => {
+  console.log(`OOPS > NEXT FXN >`);
+
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'Oops.. error';
 

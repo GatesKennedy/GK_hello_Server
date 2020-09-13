@@ -70,33 +70,30 @@ router.get('/', auth, async (request, response, next) => {
 router.post(
   '/login',
   [
-    check('emailIn', 'Please include a valid email').isEmail(),
-    check('passwordIn', 'Password is required').exists(),
+    check('emailIn').isEmail().withMessage('Please include a valid email'),
+    check('passwordIn').exists().withMessage('Password is required'),
   ],
   async (request, response, next) => {
-    console.log('(^=^) LOGIN USER > POST: api/auth/ > Enter FXN');
-    // console.log('(o_O) LOGIN USER > request.body: \n', request.body);
+    console.log('(^=^) Enter FXN > POST: api/auth/login');
     const { emailIn, passwordIn } = request.body;
     const emailLower = emailIn.toLowerCase();
-    console.log('|      user values: ', { emailLower, passwordIn });
-    console.log('=========== begin processing');
-    //~~~~~~~~~~~~~~~~~~~~~~~~~
-    //  Validation Error Response
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-      console.log('(>_<) fail validation > errors: ', errors);
-      console.log('(>_<) fail validation > errors.array() ', errors.array());
-      return response.status(400).json({
-        errors: errors.array(),
-        valid: false,
-        msg: `oh no.. field validation error`,
-      });
-    }
-    console.log('(o_O) LOGIN USER > validation: PASS');
+    console.log('=========== begin processing ===========');
     //~~~~~~~~~~~~~~~~~~~~~~~~~
     //  Async db Connection
     const client = await pool.connect();
+
     try {
+      //~~~~~~~~~~~~~~~~~~~~~~~~~
+      //  Validation Error Response
+      const errors = validationResult(request);
+      if (!errors.isEmpty()) {
+        console.log('(>_<) FAIL Validation > errors: ', errors);
+        return response.status(422).json({
+          errors: errors.array(),
+          valid: false,
+          msg: `oh no.. field validation error`,
+        });
+      }
       await client.query('BEGIN');
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Check Email
@@ -104,34 +101,27 @@ router.post(
         SELECT
             id,
             name,
-            email,
             password,
             role
         FROM tbl_user 
         WHERE LOWER(email) = ($1)
         `;
-
       const { rows } = await client.query(queryText, [emailLower]);
-      // console.log(
-      //   `(o_O) LOGIN USER > Query Response:
-      // |     User: `,
-      //   rows[0]
-      // );
-      const { id, name, email, password, role } = rows[0];
       if (!rows.length > 0) {
-        console.log('(>_<) LOGIN USER > NO Email : FAIL');
+        console.log('#####  |   (>_<) LOGIN USER > NO Email : FAIL');
         return response.status(400).json({
-          errors: [{ msg: 'oopsie: email not found' }],
+          errors: [{ msg: 'oopsie: wrong email' }],
           msg: 'msg: email not found...',
         });
       }
+      const { id, name, password, role } = rows[0];
       console.log('(o_O) LOGIN USER > Email Exists: PASS');
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Check Password
       const isMatch = await bcrypt.compare(passwordIn, password);
       if (!isMatch) {
-        console.log('(>_<) LOGIN USER > NO Password : FAIL');
+        console.log('#####  |   (>_<) LOGIN USER > NO Password : FAIL');
         return response.status(400).json({
           errors: [{ msg: 'oopsie: wrong password' }],
           msg: 'msg: wrong password',
@@ -175,17 +165,9 @@ router.post(
       //=============
       //  CATCH
     } catch (err) {
-      console.log('(>_<) LOGIN USER > FAIL Catch Err: ' + err.message);
+      const errStr = JSON.stringify(err);
+      console.log('|     (>_<) LOGIN USER > FAIL Catch > errStr: ', errStr);
       await client.query('ROLLBACK');
-      response.json({
-        errors: [
-          {
-            msg: `oopsie: email not found : 
-        ${errors.array()}`,
-          },
-        ],
-        msg: `oh no... an error occured`,
-      });
       return next(err);
     } finally {
       client.release();
@@ -212,13 +194,13 @@ router.post(
     //  Error Response
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      console.log('(>_<) fail validation > errors: ', errors);
+      console.log('#####  |   (>_<) fail validation > errors: ', errors);
       return response.status(400).json({ errors: errors.array() });
     }
     const { username, email, password, role } = request.body;
     const emailLow = email.toLowerCase();
     //  No More Admin
-    console.log('(>_<) fail No More Admin > errors: ', errors);
+    console.log('#####  |   (>_<) fail No More Admin > errors: ', errors);
     if (role === 'admin') {
       return response.json({ hack: true, msg: 'I love you... do you?' });
     }
@@ -347,7 +329,7 @@ router.post(
       //  Catch
       await client.query('ROLLBACK');
       console.error(
-        '(>_<) REGISTER USER > FAIL > CatchBlock Err: ' + err.message
+        '#####  |   (>_<) REGISTER USER > FAIL > CatchBlock Err: ' + err.message
       );
       return next(err);
     } finally {
@@ -395,10 +377,10 @@ router.get('/db', async (request, response, next) => {
 
 //============================================================
 //-----------------------------------------------------------------
-//  Catch-All Error Function
-router.use((err, req, res, next) => {
-  console.log('User.js > ENTER NEXT ERR FXN > err:\n', err);
-  res.status(500).json(err);
-});
+// //  Catch-All Error Function
+// router.use((err, req, res, next) => {
+//   console.log('User.js > ENTER NEXT ERR FXN > err:\n', err);
+//   res.status(500).json(err);
+// });
 
 module.exports = router;

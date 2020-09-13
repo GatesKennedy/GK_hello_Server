@@ -44,7 +44,7 @@ router.get('/', auth, async (request, response, next) => {
 
     response.status(200).json(rows[0]);
   } catch (err) {
-    console.error('(._.) auth.js > GET AUTH >catch: ' + err.message);
+    console.error('(>_<) auth.js > GET AUTH > err.message: ' + err.message);
     return next(err);
   }
 });
@@ -87,7 +87,7 @@ router.get('/db', async (request, response, next) => {
     //  Response
     return response.status(200).json(res.rows);
   } catch (err) {
-    console.error('(._.) test.js > catch > err: ' + err);
+    console.error('(>_<) test.js > catch > err: ' + err);
     response.status(500).send('Server error');
     return next(err);
   }

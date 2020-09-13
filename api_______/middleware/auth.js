@@ -18,18 +18,17 @@ module.exports = function (req, res, next) {
   try {
     const decoded = jwt.verify(token, shhh);
     req.user = decoded.user;
-    console.log('Auth Middleware > Catch');
+    console.log('Auth Middleware > ');
     console.log('**** decoded.user: ', decoded.user);
     console.log('**** req.user:     ', req.user);
     next();
   } catch (err) {
     console.log('Auth Middleware > Catch');
-    const reqUser = JSON.stringify(req.user);
-    const decUser = JSON.stringify(decoded.user);
-    console.log('reqUser: ', reqUser);
-    console.log('decUser: ', decUser);
+    console.log('(>_<) reqUser: ', req.user);
+    console.log('(>_<) decUser: ', decoded.user);
     res.status(401).json({
       msg: 'Token is not valid ',
     });
+    return next(err);
   }
 };
