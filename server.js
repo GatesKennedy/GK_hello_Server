@@ -22,32 +22,84 @@ class AppError extends Error {
 const express = require('express');
 const http = require('http');
 const enforce = require('express-sslify');
+const { NODE_ENV } = process.env;
 //  init
 const serv = express();
-serv.use(enforce.HTTPS({ trustProtoHeader: true }));
 const PORT = process.env.PORT || 5000;
-// Use enforce.HTTPS({ trustProtoHeader: true }) in case you are behind
-// a load balancer (e.g. Heroku). See further comments below > [https://www.npmjs.com/package/express-sslify]
-
-console.log();
-http.createServer(serv).listen(PORT, () =>
-  console.log(`
+if (NODE_ENV === 'production') {
+  serv.use(enforce.HTTPS({ trustProtoHeader: true }));
+  // Use enforce.HTTPS({ trustProtoHeader: true }) in case you are behind
+  // a load balancer (e.g. Heroku). See further comments below > [https://www.npmjs.com/package/express-sslify]
+  http.createServer(serv).listen(PORT, () =>
+    console.log(`
   ~~~~~~~~~ server.js ~~~~~~~~~
   (^=^)  listening on port ${PORT}
+          Secure: https
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   `)
-);
+  );
+} else if (NODE_ENV === 'development') {
+  http.createServer(serv).listen(PORT, () =>
+    console.log(`
+  ~~~~~~~~~ server.js ~~~~~~~~~
+  (^=^)  listening on port ${PORT}
+          Insecure: http
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  `)
+  );
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    Socket.io
 //~~~~~~~~~~~~~~~~~~~~~~~
 
 //  import
-const io = require('socket.io')(5555);
+// const io = require('socket.io')(serv);
 //  init
-io.on('connection', (socket) => {
-  socket.emit('chat-message', "oh hi, it's great to see you here.");
-});
+// io.on('connection', (socket) => {
+//   socket.emit('chat-message', "oh hi, it's great to see you here.");
+// });
+
+// const sockServe = http.createServer();
+// const io = require('socket.io')(sockServe);
+
+// io.on('connection', function (client) {
+//   socket.emit('chat-message', "oh hi, it's great to see you here.");
+
+//   client.on('register', handleRegister);
+
+//   client.on('join', handleJoin);
+
+//   client.on('leave', handleLeave);
+
+//   client.on('message', handleMessage);
+
+//   client.on('chatrooms', handleGetChatrooms);
+
+//   client.on('availableUsers', handleGetAvailableUsers);
+
+//   client.on('disconnect', function () {
+//     console.log('client disconnect...', client.id);
+//     handleDisconnect();
+//   });
+
+//   client.on('error', function (err) {
+//     console.log('received error from client:', client.id);
+//     console.log(err);
+//   });
+// });
+
+// sockServe.listen(5100, function (err) {
+//   if (err) {
+//     console.log(`(>_<)  ERROR > sockServe.js > sockServe.listen()`);
+//     throw err;
+//   }
+//   console.log(`
+//   ~~~~~~~~~ socket.io ~~~~~~~~~
+//   (^=^)  listening on port 5100
+//   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//   `);
+// });
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    MIDDLEWARE
@@ -72,26 +124,27 @@ serv.use(
     preserveExtension: true,
   })
 );
+
 serv.use(cors());
-// let whitelist = [
-//   process.env.CLIENT_ORIGIN_DEV,
-//   process.env.CLIENT_ORIGIN_STAGE,
-//   process.env.CLIENT_ORIGIN_GK,
-//   process.env.CLIENT_ORIGIN_CONOR,
-// ];
-// let corsOptions = {
-//   origin: function (origin, callback) {
-//     if (whitelist.indexOf(origin) !== -1 || !origin) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   },
-//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-// };
-// serv.options('/api/aws', cors(corsOptions)); // include before other routes
-// serv.use(cors(corsOptions));
+let whitelist = [
+  process.env.CLIENT_ORIGIN_DEV,
+  process.env.CLIENT_ORIGIN_STAGE,
+  process.env.CLIENT_ORIGIN_GK,
+  process.env.CLIENT_ORIGIN_CONOR,
+];
+let corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+serv.options('/api/aws', cors(corsOptions)); // include before other routes
+serv.use(cors(corsOptions));
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //      ROUTES

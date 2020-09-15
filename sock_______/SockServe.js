@@ -1,5 +1,8 @@
-const sockServe = require('http').createServer();
-const io = require('socket.io')(sockServe);
+// const serv = require('../server');
+// const io = require('socket.io')(serv);
+
+// const sockServe = require('http').createServer();
+// const io = require('socket.io')(sockServe);
 
 io.on('connection', function (client) {
   client.on('register', handleRegister);
@@ -25,7 +28,10 @@ io.on('connection', function (client) {
   });
 });
 
-sockServe.listen(3000, function (err) {
-  if (err) throw err;
+sockServe.listen(5100, function (err) {
+  if (err) {
+    console.log(`(>_<)  ERROR > sockServe.js > sockServe.listen()`);
+    throw err;
+  }
   console.log('listening on port 3000');
 });
