@@ -13,14 +13,15 @@ const pool = new Pool({
 });
 
 //~~~~~~~~~~~~~~~~~~~~~~~
-console.log('~~~~~~~ db.js ~~~~~~~');
-if (pool) console.log(`(^=^)  GOOD: PostgresDB Connected...`);
-else console.log(`(-_-) BAD: PostgresDB Disconnected...`);
+var logStr = `  ~~~~~~~~~~~ db.js ~~~~~~~~~~~`;
+if (pool) logStr += `\n  (^=^)  PostgresDB Connected...`;
+else logStr += `\n  (-_-)  BAD: PostgresDB Disconnected...`;
 envStr
-  ? console.log('(^=^)  NODE_ENV = ' + envStr)
-  : console.log('(-_-)  NODE_ENV: ' + envStr);
-cxnStr
-  ? console.log('(^=^)  cxnStr = ' + cxnStr)
-  : console.log('(-_-)  cxnStr = ' + cxnStr);
-
+  ? (logStr += `\n  (^=^)  NODE_ENV = ` + envStr)
+  : (logStr += `\n  (-_-)  NODE_ENV = ` + envStr);
+// cxnStr
+//   ? (logStr += `\n  (^=^)  cxnStr = ` + cxnStr)
+//   : (logStr += `\n  (-_-)  cxnStr = ` + cxnStr);
+logStr += `\n  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`;
+console.log(logStr);
 module.exports = pool;

@@ -29,12 +29,14 @@ const PORT = process.env.PORT || 5000;
 // Use enforce.HTTPS({ trustProtoHeader: true }) in case you are behind
 // a load balancer (e.g. Heroku). See further comments below > [https://www.npmjs.com/package/express-sslify]
 
-console.log('~~~~~ server.js ~~~~~');
-http
-  .createServer(serv)
-  .listen(PORT, () =>
-    console.log(`(^=^)  GOOD: Server listening on port ${PORT}`)
-  );
+console.log();
+http.createServer(serv).listen(PORT, () =>
+  console.log(`
+  ~~~~~~~~~ server.js ~~~~~~~~~
+  (^=^)  listening on port ${PORT}
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  `)
+);
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    Socket.io
