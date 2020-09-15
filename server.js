@@ -24,13 +24,22 @@ const http = require('http');
 const enforce = require('express-sslify');
 const { NODE_ENV } = process.env;
 //  init
-const serv = express();
+const app = express();
 const PORT = process.env.PORT || 5000;
+const serv = http.createServer(app);
+const io = require('socket.io')(serv);
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.emit('chat-message', "oh hi, it's great to see you here.");
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});
+
 if (NODE_ENV === 'production') {
-  serv.use(enforce.HTTPS({ trustProtoHeader: true }));
-  // Use enforce.HTTPS({ trustProtoHeader: true }) in case you are behind
-  // a load balancer (e.g. Heroku). See further comments below > [https://www.npmjs.com/package/express-sslify]
-  http.createServer(serv).listen(PORT, () =>
+  app.use(enforce.HTTPS({ trustProtoHeader: true })); // Use enforce.HTTPS({ trustProtoHeader: true }) in case you are behind a load balancer (e.g. Heroku). See further comments below > [https://www.npmjs.com/package/express-sslify]
+  serv.listen(PORT, () =>
     console.log(`
   ~~~~~~~~~ server.js ~~~~~~~~~
   (^=^)  listening on port ${PORT}
@@ -39,7 +48,7 @@ if (NODE_ENV === 'production') {
   `)
   );
 } else if (NODE_ENV === 'development') {
-  http.createServer(serv).listen(PORT, () =>
+  serv.listen(PORT, () =>
     console.log(`
   ~~~~~~~~~ server.js ~~~~~~~~~
   (^=^)  listening on port ${PORT}
@@ -54,7 +63,7 @@ if (NODE_ENV === 'production') {
 //~~~~~~~~~~~~~~~~~~~~~~~
 
 //  import
-// const io = require('socket.io')(serv);
+// const io = require('socket.io')(app);
 //  init
 // io.on('connection', (socket) => {
 //   socket.emit('chat-message', "oh hi, it's great to see you here.");
@@ -62,10 +71,19 @@ if (NODE_ENV === 'production') {
 
 // const sockServe = http.createServer();
 // const io = require('socket.io')(sockServe);
+// sockServe.listen(5100, function (err) {
+//   if (err) {
+//     console.log(`(>_<)  ERROR > sockServe.js > sockServe.listen()`);
+//     throw err;
+//   }
+//   console.log(`
+//   ~~~~~~~~~ socket.io ~~~~~~~~~
+//   (^=^)  listening on port 5100
+//   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//   `);
+// });
 
 // io.on('connection', function (client) {
-//   socket.emit('chat-message', "oh hi, it's great to see you here.");
-
 //   client.on('register', handleRegister);
 
 //   client.on('join', handleJoin);
@@ -89,18 +107,6 @@ if (NODE_ENV === 'production') {
 //   });
 // });
 
-// sockServe.listen(5100, function (err) {
-//   if (err) {
-//     console.log(`(>_<)  ERROR > sockServe.js > sockServe.listen()`);
-//     throw err;
-//   }
-//   console.log(`
-//   ~~~~~~~~~ socket.io ~~~~~~~~~
-//   (^=^)  listening on port 5100
-//   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//   `);
-// });
-
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    MIDDLEWARE
 //~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,10 +117,10 @@ const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const { AWS_FILE_SIZE } = process.env;
 //  init
-serv.use(bodyParser.json());
-serv.use(express.json({ extended: false }));
-serv.use(express.urlencoded({ extended: true }));
-serv.use(
+app.use(bodyParser.json());
+app.use(express.json({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
+app.use(
   fileUpload({
     createParentPath: true,
     useTempFiles: true,
@@ -125,7 +131,7 @@ serv.use(
   })
 );
 
-serv.use(cors());
+app.use(cors());
 let whitelist = [
   process.env.CLIENT_ORIGIN_DEV,
   process.env.CLIENT_ORIGIN_STAGE,
@@ -143,13 +149,15 @@ let corsOptions = {
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
-serv.options('/api/aws', cors(corsOptions)); // include before other routes
-serv.use(cors(corsOptions));
+app.options('/api/aws', cors(corsOptions)); // include before other routes
+app.use(cors(corsOptions));
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //      ROUTES
 //~~~~~~~~~~~~~~~~~~~~~~~
-
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
 //  import
 const auth = require('./api_______/api/auth');
 const user = require('./api_______/api/user');
@@ -157,12 +165,12 @@ const chat = require('./api_______/api/chat');
 const note = require('./api_______/api/note');
 const aws = require('./aws_______/api/action');
 //  init
-serv.use('/api/auth', auth);
-serv.use('/api/user', user);
-serv.use('/api/chat', chat);
-serv.use('/api/note', note);
-serv.use('/api/aws', aws);
-serv.all('*', (req, res, next) => {
+app.use('/api/auth', auth);
+app.use('/api/user', user);
+app.use('/api/chat', chat);
+app.use('/api/note', note);
+app.use('/api/aws', aws);
+app.all('*', (req, res, next) => {
   next(new AppError(`Oops.. ${req.originalUrl} is not for you!`, 404));
 });
 
@@ -176,7 +184,7 @@ const {
   sendErrorProd,
 } = require('./api_______/middleware/errorGen');
 //  init
-serv.use((err, req, res, next) => {
+app.use((err, req, res, next) => {
   console.log(`OOPS > NEXT FXN >`);
 
   err.statusCode = err.statusCode || 500;
@@ -189,4 +197,4 @@ serv.use((err, req, res, next) => {
   }
 });
 
-module.exports = serv;
+module.exports = app;

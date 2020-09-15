@@ -1,5 +1,5 @@
-// const serv = require('../server');
-// const io = require('socket.io')(serv);
+// const app = require('../server');
+// const io = require('socket.io')(app);
 
 // const sockServe = require('http').createServer();
 // const io = require('socket.io')(sockServe);
