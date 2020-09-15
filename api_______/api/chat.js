@@ -69,10 +69,4 @@ router.post('/', auth, async (request, response, next) => {
   }
 });
 
-//-----------------------------------------------------------------
-//  Catch-All Error Function
-router.use((err, req, res, next) => {
-  res.json(err);
-});
-
 module.exports = router;

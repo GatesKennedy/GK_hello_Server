@@ -118,10 +118,4 @@ router.post('/action/', cors(), async (req, res, next) => {
 //  ==   /stream   ==
 //  =================
 
-//  Catch-All Error Function
-router.use((err, request, response, next) => {
-  console.log('Next FXN Error response');
-  response.json(err);
-});
-
 module.exports = router;

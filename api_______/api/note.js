@@ -39,10 +39,4 @@ router.get('/', auth, async (request, response, next) => {
 //  @desc       LOGIN-AUTH User | GET Token
 //  @access     PUBLIC
 
-//-----------------------------------------------------------------
-//  Catch-All Error Function
-router.use((err, req, res, next) => {
-  res.json(err);
-});
-
 module.exports = router;

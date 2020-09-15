@@ -93,11 +93,4 @@ router.get('/db', async (request, response, next) => {
   }
 });
 
-//-----------------------------------------------------------------
-//  Catch-All Error Function
-router.use((err, req, res, next) => {
-  console.log('User.js > ENTER NEXT ERR FXN > err:\n', err);
-  res.status(500).json(err);
-});
-
 module.exports = router;

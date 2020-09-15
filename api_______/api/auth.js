@@ -227,16 +227,14 @@ router.post(
         `;
       const { rows } = await client.query(queryText, [emailLow]);
       if (rows.length > 0) {
-        return response
-          .status(400)
-          .json({
-            errors: [
-              {
-                msg:
-                  'eh.. someone is using that email.. you already have an account?',
-              },
-            ],
-          });
+        return response.status(400).json({
+          errors: [
+            {
+              msg:
+                'eh.. someone is using that email.. you already have an account?',
+            },
+          ],
+        });
         //  !!! error response !!!
       }
       console.log('>Email');
@@ -391,13 +389,5 @@ router.get('/db', async (request, response, next) => {
     return next(err);
   }
 });
-
-//============================================================
-//-----------------------------------------------------------------
-// //  Catch-All Error Function
-// router.use((err, req, res, next) => {
-//   console.log('User.js > ENTER NEXT ERR FXN > err:\n', err);
-//   res.status(500).json(err);
-// });
 
 module.exports = router;

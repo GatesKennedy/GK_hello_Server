@@ -32,8 +32,4 @@ router.get('/', async (request, response, next) => {
   }
 });
 
-router.use((err, req, res, next) => {
-  res.json(err);
-});
-
 module.exports = router;

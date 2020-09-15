@@ -159,6 +159,7 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 //  import
+const sock = require(`./sock_______/api/sock`);
 const auth = require('./api_______/api/auth');
 const user = require('./api_______/api/user');
 const chat = require('./api_______/api/chat');
@@ -167,6 +168,7 @@ const aws = require('./aws_______/api/action');
 //  init
 app.use('/api/auth', auth);
 app.use('/api/user', user);
+app.use('/api/sock', sock);
 app.use('/api/chat', chat);
 app.use('/api/note', note);
 app.use('/api/aws', aws);
