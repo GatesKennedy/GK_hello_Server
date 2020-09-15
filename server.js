@@ -20,13 +20,21 @@ class AppError extends Error {
 
 //  import
 const express = require('express');
+const http = require('http');
+const enforce = require('express-sslify');
 //  init
 const serv = express();
+serv.use(enforce.HTTPS({ trustProtoHeader: true }));
 const PORT = process.env.PORT || 5000;
+// Use enforce.HTTPS({ trustProtoHeader: true }) in case you are behind
+// a load balancer (e.g. Heroku). See further comments below > [https://www.npmjs.com/package/express-sslify]
+
 console.log('~~~~~ server.js ~~~~~');
-serv.listen(PORT, () =>
-  console.log(`(^=^)  GOOD: Server listening on port ${PORT}`)
-);
+http
+  .createServer(serv)
+  .listen(PORT, () =>
+    console.log(`(^=^)  GOOD: Server listening on port ${PORT}`)
+  );
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    Socket.io
