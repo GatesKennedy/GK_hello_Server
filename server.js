@@ -95,6 +95,10 @@ io.on('connection', function (client) {
   client.on('message', (data) => {
     io.emit('message', data);
   });
+  client.on('sockMsg', (data) => {
+    console.log('sockMsg', data);
+    io.emit('sockMsg', data);
+  });
   // client.on('leave', handleLeave);
 
   // client.on('join', handleJoin);
