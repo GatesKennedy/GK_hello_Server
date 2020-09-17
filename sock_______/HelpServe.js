@@ -43,3 +43,10 @@ function handleDisconnect() {
   // remove member from all chatrooms
   chatroomManager.removeClient(client);
 }
+
+module.exports = {
+  handleRegister,
+  handleEvent,
+  handleJoin,
+  handleDisconnect,
+};

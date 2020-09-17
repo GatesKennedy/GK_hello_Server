@@ -2,7 +2,7 @@
   "name": "GK_hello_server",
   "version": "1.0.0",
   "description": "Digital Cover Letter",
-  "main": "app.js",
+  "main": "server.js",
   "engines": {
     "node": "12.13.1",
     "npm": "5.3.0"

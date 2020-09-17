@@ -27,36 +27,28 @@ const { NODE_ENV } = process.env;
 const app = express();
 const PORT = process.env.PORT || 5000;
 const serv = http.createServer(app);
-const io = require('socket.io')(serv);
-
-io.on('connection', (socket) => {
-  console.log('a user connected');
-  socket.emit('chat-message', "oh hi, it's great to see you here.");
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-});
 
 if (NODE_ENV === 'production') {
   app.use(enforce.HTTPS({ trustProtoHeader: true })); // Use enforce.HTTPS({ trustProtoHeader: true }) in case you are behind a load balancer (e.g. Heroku). See further comments below > [https://www.npmjs.com/package/express-sslify]
-  serv.listen(PORT, () =>
-    console.log(`
-  ~~~~~~~~~ server.js ~~~~~~~~~
-  (^=^)  listening on port ${PORT}
-          Secure: https
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  `)
-  );
-} else if (NODE_ENV === 'development') {
-  serv.listen(PORT, () =>
-    console.log(`
-  ~~~~~~~~~ server.js ~~~~~~~~~
-  (^=^)  listening on port ${PORT}
-          Insecure: http
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  `)
-  );
 }
+
+serv.listen(PORT, () => {
+  if (NODE_ENV === 'production') {
+    console.log(`
+    ~~~~~~~~~ server.js ~~~~~~~~~
+    (^=^)  listening on port ${PORT}
+            Secure: https
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    `);
+  } else if (NODE_ENV === 'development') {
+    console.log(`h
+    ~~~~~~~~~ server.js ~~~~~~~~~
+    (^=^)  listening on port ${PORT}
+            Insecure: http
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    `);
+  }
+});
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    Socket.io
@@ -69,6 +61,8 @@ if (NODE_ENV === 'production') {
 //   socket.emit('chat-message', "oh hi, it's great to see you here.");
 // });
 
+// // Socket Init 2
+// // -------------
 // const sockServe = http.createServer();
 // const io = require('socket.io')(sockServe);
 // sockServe.listen(5100, function (err) {
@@ -83,29 +77,44 @@ if (NODE_ENV === 'production') {
 //   `);
 // });
 
-// io.on('connection', function (client) {
-//   client.on('register', handleRegister);
+// // Socket Init 3
+// // -------------
+//  import
+const {
+  handleRegister,
+  handleEvent,
+  handleJoin,
+  handleDisconnect,
+} = require('./sock_______/HelpServe');
+//  init
+const io = require('socket.io')(serv);
 
-//   client.on('join', handleJoin);
+io.on('connection', function (client) {
+  console.log('frkn user connected');
 
-//   client.on('leave', handleLeave);
+  client.on('message', (data) => {
+    io.emit('message', data);
+  });
+  // client.on('leave', handleLeave);
 
-//   client.on('message', handleMessage);
+  // client.on('join', handleJoin);
 
-//   client.on('chatrooms', handleGetChatrooms);
+  // client.on('register', handleRegister);
 
-//   client.on('availableUsers', handleGetAvailableUsers);
+  // client.on('chatrooms', handleGetChatrooms);
 
-//   client.on('disconnect', function () {
-//     console.log('client disconnect...', client.id);
-//     handleDisconnect();
-//   });
+  // client.on('availableUsers', handleGetAvailableUsers);
 
-//   client.on('error', function (err) {
-//     console.log('received error from client:', client.id);
-//     console.log(err);
-//   });
-// });
+  client.on('disconnect', function () {
+    console.log('client disconnect...', client.id);
+    // handleDisconnect();
+  });
+
+  client.on('error', function (err) {
+    console.log('received error from client:', client.id);
+    console.log(err);
+  });
+});
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    MIDDLEWARE
@@ -155,9 +164,6 @@ app.use(cors(corsOptions));
 //~~~~~~~~~~~~~~~~~~~~~~~
 //      ROUTES
 //~~~~~~~~~~~~~~~~~~~~~~~
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
 //  import
 const sock = require(`./sock_______/api/sock`);
 const auth = require('./api_______/api/auth');
@@ -199,4 +205,4 @@ app.use((err, req, res, next) => {
   }
 });
 
-module.exports = app;
+module.exports = { app, serv, io };

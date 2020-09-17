@@ -1,10 +1,17 @@
-// const app = require('../server');
-// const io = require('socket.io')(app);
+//~~~~~~~~~~~~~~~~~~~~~~~
+//    Socket.io
+//~~~~~~~~~~~~~~~~~~~~~~~
 
-// const sockServe = require('http').createServer();
-// const io = require('socket.io')(sockServe);
+import serv from '../server';
+const ioC = require('socket.io')(serv);
 
-io.on('connection', function (client) {
+ioC.on('connection', function (client) {
+  console.log('frkn user connected');
+
+  client.emit('alert', 'oh goodness... there you are peter!');
+
+  // client.emit('alert', 'oh goodness... there you are peter!');
+
   client.on('register', handleRegister);
 
   client.on('join', handleJoin);
@@ -18,7 +25,7 @@ io.on('connection', function (client) {
   client.on('availableUsers', handleGetAvailableUsers);
 
   client.on('disconnect', function () {
-    console.log('client disconnect...', client.id);
+    console.log('frkn client disconnect...', client.id);
     handleDisconnect();
   });
 
@@ -28,10 +35,4 @@ io.on('connection', function (client) {
   });
 });
 
-sockServe.listen(5100, function (err) {
-  if (err) {
-    console.log(`(>_<)  ERROR > sockServe.js > sockServe.listen()`);
-    throw err;
-  }
-  console.log('listening on port 3000');
-});
+module.exports = ioC;

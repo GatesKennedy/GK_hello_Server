@@ -9,20 +9,23 @@ const router = express.Router();
 //  =============
 
 //  TEST ROUTE NO DB
-//  @route      GET api/test
+//  @route      GET api/test/sars
 //  @desc       respond "Oh, hello there."
 //  @access     PUBLIC
 router.get('/sars', async (request, response, next) => {
+  console.log(`ENTER: api/test/sars`);
+
   const testString = 'oh, hello there.';
   //  Response
   return response.status(200).send(testString);
 });
 
 //  TEST ROUTE with DB
-//  @route      GET api/test
+//  @route      GET api/test/db
 //  @desc       respond "list of all artists"
 //  @access     PUBLIC
 router.get('/db', async (request, response, next) => {
+  console.log(`ENTER: api/test/db`);
   const queryText = `
     SELECT 
       name,
