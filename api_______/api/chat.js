@@ -18,7 +18,7 @@ const router = express.Router();
 //  @access     PRIVATE
 router.get('/', auth, async (request, response, next) => {
   console.log('(^=^) GET: api/chat/ > LOAD CHATS >  Enter FXN');
-  const { id } = request.body;
+  const id = request.user.id;
   const queryText = `
   SELECT 
   id,
