@@ -17,18 +17,22 @@ const router = express.Router();
 //  @desc       AUTH Token | AUTH User
 //  @access     PRIVATE
 router.get('/', auth, async (request, response, next) => {
-  console.log('(^=^) LOAD USER > GET: api/auth/ > Enter FXN');
+  console.log('(^=^) AUTH USER > GET: api/auth/ > Enter FXN');
+  const id = request.user.id;
+  console.log('(^=^) AUTH USER > GET: api/auth/ > user_id: ', id);
+
   const queryText = `
       SELECT 
         id, 
-        role
+        role,
+        name
       FROM tbl_user 
-      WHERE id=($1)`;
+      WHERE id='${id}'`;
   try {
-    const { rows } = await pool.query(queryText, [request.user.id]);
+    const { rows } = await pool.query(queryText);
 
     if (rows.length === 1) {
-      const { id, role } = rows[0];
+      const { id, role, name } = rows[0];
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Return JWT
       const payload = {
@@ -37,6 +41,7 @@ router.get('/', auth, async (request, response, next) => {
         },
       };
       jwt.sign(payload, shhh, { expiresIn: 18000 }, (err, token) => {
+        console.log('(^=^) AUTH USER > GET: api/auth/ > jwt.sign...');
         if (err) throw err;
         role === 'admin'
           ? response.json({
@@ -51,10 +56,11 @@ router.get('/', auth, async (request, response, next) => {
             });
       });
     } else if (rows[0].length < 1) {
+      //  !!! Throwing Errors issue...?
       throw 'This User cannot be found';
     } else throw 'There was an error finding this User';
   } catch (err) {
-    console.error('(._.) auth.js > GET AUTH > catch: ', err);
+    console.error('(>_<) auth.js > GET AUTH > catch: ', err);
     return next(err);
   }
 });

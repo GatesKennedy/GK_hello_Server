@@ -9,14 +9,44 @@ const pool = require('../../db_______/db');
 
 const router = express.Router();
 //  ===============
-//  ==   /chat   ==
+//  ==   /talk   ==
 //  ===============
 
-//  LOAD CHAT
+//  LOAD TALK ACCESS
 //  @route      GET api/chat/
 //  @desc       AUTH Token | LOAD User Chats
 //  @access     PRIVATE
 router.get('/', auth, async (request, response, next) => {
+  console.log('(^=^) GET: api/chat/ > LOAD CHATS >  Enter FXN');
+  const id = request.user.id;
+  const queryText = `
+  SELECT 
+    tT.id,
+    tt.type,
+    tt.seen
+  FROM tbl_talk tT
+  INNER JOIN tbl_access tA
+    on tA.talk_id = tT.id 
+  WHERE 
+    tA.user_id = '${id}'
+  ;`;
+  try {
+    const { rows } = await pool.query(queryText);
+    response.status(200).json(rows);
+  } catch (err) {
+    console.error('(>_<) GET: api/chat/ > LOAD CHATS > catch: ' + err.message);
+    return next(err);
+  }
+});
+//  ===============
+//  ==   /chat   ==
+//  ===============
+
+//  LOAD CHAT
+//  @route      GET api/chat/chat
+//  @desc       AUTH Token | LOAD User Chats
+//  @access     PRIVATE
+router.get('/chat', auth, async (request, response, next) => {
   console.log('(^=^) GET: api/chat/ > LOAD CHATS >  Enter FXN');
   const id = request.user.id;
   const queryText = `
@@ -34,8 +64,9 @@ router.get('/', auth, async (request, response, next) => {
     SELECT talk_id
     FROM tbl_access
     WHERE user_id = '${id}'
-    );
-    `;
+    )
+  
+    ;`;
   try {
     const { rows } = await pool.query(queryText);
     response.status(200).json(rows);
@@ -53,8 +84,8 @@ router.get('/', auth, async (request, response, next) => {
 //  @route      GET api/chat/hist
 //  @desc       AUTH Token | LOAD User Chats
 //  @access     PRIVATE
-router.get('/', auth, async (request, response, next) => {
-  console.log('(^=^) GET: api/chat/ > LOAD CHATS >  Enter FXN');
+router.get('/history', auth, async (request, response, next) => {
+  console.log('(^=^) GET: api/chat/history >  Enter FXN');
   const { id } = request.body;
   const queryText = `
     SELECT 
