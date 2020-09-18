@@ -86,23 +86,29 @@ router.get('/chat', auth, async (request, response, next) => {
 //  @access     PRIVATE
 router.get('/history', auth, async (request, response, next) => {
   console.log('(^=^) GET: api/chat/history >  Enter FXN');
-  const { id } = request.body;
+  const id = request.user.id;
   const queryText = `
-    SELECT 
-        id,
-        body,
-        send_id,
+    WITH tbl_msgs AS (
+        SELECT 
+            json_build_object(
+                'id', tH.id,
+                'body', tH.body,
+                'send_id', tH.send_id, 
+                'seen', tH.seen,
+                'date_time', tH.date_time
+            ) AS msgObj,
+            tH.talk_id AS talk_id
+        FROM tbl_talk_history tH
+        INNER JOIN tbl_access tA
+            on tA.talk_id = tH.talk_id
+        WHERE tA.user_id = '${id}'
+        )
+    SELECT
         talk_id,
-        seen,
-        date_time,
-        edit_note
-    FROM tbl_talk_history
-    WHERE 
-        talk_id = (
-            SELECT talk_id
-            FROM tbl_access
-            WHERE user_id = '${id}'
-        );
+        array_agg(msgObj) AS msgObj
+    FROM tbl_msgs 
+    GROUP BY talk_id
+    ;
     `;
   try {
     const { rows } = await pool.query(queryText);
