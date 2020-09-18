@@ -26,16 +26,36 @@ FROM tbl_user AS tUser
 WHERE tUser.id = 'fc35067e-a54d-4009-ba56-82896f022752'
 ;
 
---  Get user access list
+--  Get Talk Member Access list
+WITH tbl_members AS (
+    SELECT
+        json_build_object(
+            'name', tU.name,
+            'id', tU.id
+        ) AS member,
+        tA.talk_id AS talk_id
+    FROM tbl_user tU
+    INNER JOIN tbl_access tA
+        on tA.user_id = tU.id
+)
 SELECT 
     tT.id,
     tt.type,
-    tt.seen
-FROM tbl_talk tT
+    tt.seen,
+    array_agg( tM.member ) AS members
+FROM tbl_members tM
+INNER JOIN tbl_talk tT 
+    on tT.id = tM.talk_id
 INNER JOIN tbl_access tA
-    on tA.talk_id = tT.id 
+    on tA.talk_id = tM.talk_id
+INNER JOIN tbl_user tU
+    on tU.id = tA.user_id
 WHERE 
     tA.user_id = '684ebc91-f2e4-4e5f-8f0b-4ea2b050adce'
+GROUP BY 
+    tT.id,
+    tT.type,
+    tT.seen
 ;
 
 --  aggregate chat history into json arrays

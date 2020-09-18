@@ -20,18 +20,39 @@ router.get('/', auth, async (request, response, next) => {
   console.log('(^=^) GET: api/chat/ > LOAD CHATS >  Enter FXN');
   const id = request.user.id;
   const queryText = `
+  WITH tbl_members AS (
+    SELECT
+      json_build_object(
+        'name', tU.name,
+        'id', tU.id
+      ) AS member,
+      tA.talk_id AS talk_id
+    FROM tbl_user tU
+    INNER JOIN tbl_access tA
+      on tA.user_id = tU.id
+  )
   SELECT 
     tT.id,
     tt.type,
-    tt.seen
-  FROM tbl_talk tT
+    tt.seen,
+    array_agg( tM.member ) AS members
+  FROM tbl_members tM
+  INNER JOIN tbl_talk tT 
+    on tT.id = tM.talk_id
   INNER JOIN tbl_access tA
-    on tA.talk_id = tT.id 
+    on tA.talk_id = tM.talk_id
+  INNER JOIN tbl_user tU
+    on tU.id = tA.user_id
   WHERE 
     tA.user_id = '${id}'
+  GROUP BY 
+    tT.id,
+    tT.type,
+    tT.seen
   ;`;
   try {
     const { rows } = await pool.query(queryText);
+    console.log(`|    GET: api/chat/ > rows: `, rows);
     response.status(200).json(rows);
   } catch (err) {
     console.error('(>_<) GET: api/chat/ > LOAD CHATS > catch: ' + err.message);
