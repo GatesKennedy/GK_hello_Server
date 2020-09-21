@@ -41,7 +41,7 @@ serv.listen(PORT, () => {
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     `);
   } else if (NODE_ENV === 'development') {
-    console.log(`h
+    console.log(`
     ~~~~~~~~~ server.js ~~~~~~~~~
     (^=^)  listening on port ${PORT}
             Insecure: http
@@ -54,71 +54,15 @@ serv.listen(PORT, () => {
 //    Socket.io
 //~~~~~~~~~~~~~~~~~~~~~~~
 
-//  import
-// const io = require('socket.io')(app);
-//  init
-// io.on('connection', (socket) => {
-//   socket.emit('chat-message', "oh hi, it's great to see you here.");
-// });
-
-// // Socket Init 2
-// // -------------
-// const sockServe = http.createServer();
-// const io = require('socket.io')(sockServe);
-// sockServe.listen(5100, function (err) {
-//   if (err) {
-//     console.log(`(>_<)  ERROR > sockServe.js > sockServe.listen()`);
-//     throw err;
-//   }
-//   console.log(`
-//   ~~~~~~~~~ socket.io ~~~~~~~~~
-//   (^=^)  listening on port 5100
-//   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//   `);
-// });
-
 // // Socket Init 3
 // // -------------
 //  import
-const {
-  handleRegister,
-  handleEvent,
-  handleJoin,
-  handleDisconnect,
-} = require('./sock_______/HelpServe');
+const SockService = require('./sock_______/utils/ClassSocket');
+const SocketIO = require('socket.io');
 //  init
-const io = require('socket.io')(serv);
-
-io.on('connection', function (client) {
-  console.log('frkn user connected');
-
-  client.on('message', (data) => {
-    io.emit('message', data);
-  });
-  client.on('sockMsg', (data) => {
-    console.log('sockMsg', data);
-    io.emit('sockMsg', data);
-  });
-  // client.on('leave', handleLeave);
-
-  // client.on('join', handleJoin);
-
-  // client.on('register', handleRegister);
-
-  // client.on('chatrooms', handleGetChatrooms);
-
-  // client.on('availableUsers', handleGetAvailableUsers);
-
-  client.on('disconnect', function () {
-    console.log('client disconnect...', client.id);
-    // handleDisconnect();
-  });
-
-  client.on('error', function (err) {
-    console.log('received error from client:', client.id);
-    console.log(err);
-  });
-});
+const sockServe = new SockService();
+global.io = SocketIO(serv);
+global.io.on('connection', sockServe.connection);
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    MIDDLEWARE
@@ -172,6 +116,7 @@ app.use(cors(corsOptions));
 const sock = require(`./sock_______/api/sock`);
 const auth = require('./api_______/api/auth');
 const user = require('./api_______/api/user');
+const talk = require('./api_______/api/talk');
 const chat = require('./api_______/api/chat');
 const note = require('./api_______/api/note');
 const aws = require('./aws_______/api/action');
@@ -179,6 +124,7 @@ const aws = require('./aws_______/api/action');
 app.use('/api/auth', auth);
 app.use('/api/user', user);
 app.use('/api/sock', sock);
+app.use('/api/talk', talk);
 app.use('/api/chat', chat);
 app.use('/api/note', note);
 app.use('/api/aws', aws);
@@ -209,4 +155,4 @@ app.use((err, req, res, next) => {
   }
 });
 
-module.exports = { app, serv, io };
+module.exports = serv;

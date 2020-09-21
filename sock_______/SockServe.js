@@ -2,7 +2,7 @@
 //    Socket.io
 //~~~~~~~~~~~~~~~~~~~~~~~
 
-import serv from '../server';
+import serv from '../server.js';
 const ioC = require('socket.io')(serv);
 
 ioC.on('connection', function (client) {

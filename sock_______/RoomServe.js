@@ -1,30 +1,31 @@
 const members = new Map();
 let chatHistory = [];
 
-function broadcastMessage(message) {
-  members.forEach((m) => m.emit('message', message));
-}
+exports.handleMessage = (data) => {
+  // members.forEach((m) => m.emit('message', message));
+  io.emit('message', data);
+};
 
-function addEntry(entry) {
+exports.addEntry = (entry) => {
   chatHistory = chatHistory.concat(entry);
-}
+};
 
-function getChatHistory() {
+exports.getChatHistory = () => {
   return chatHistory.slice();
-}
+};
 
-function addUser(client) {
+exports.addUser = (client) => {
   members.set(client.id, client);
-}
+};
 
-function removeUser(client) {
+exports.removeUser = (client) => {
   members.delete(client.id);
-}
+};
 
-function serialize() {
+exports.serialize = () => {
   return {
     name,
     image,
     numMembers: members.size,
   };
-}
+};

@@ -19,9 +19,6 @@ else logStr += `\n  (-_-)  BAD: PostgresDB Disconnected...`;
 envStr
   ? (logStr += `\n  (^=^)  NODE_ENV = ` + envStr)
   : (logStr += `\n  (-_-)  NODE_ENV = ` + envStr);
-// cxnStr
-//   ? (logStr += `\n  (^=^)  cxnStr = ` + cxnStr)
-//   : (logStr += `\n  (-_-)  cxnStr = ` + cxnStr);
 logStr += `\n  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`;
 console.log(logStr);
 module.exports = pool;

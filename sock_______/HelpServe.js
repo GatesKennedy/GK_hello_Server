@@ -1,4 +1,8 @@
-function handleRegister(userName, callback) {
+//~~~~~~~~~~~~~~~~~~~~~~~
+//    Event Methods
+//~~~~~~~~~~~~~~~~~~~~~~~
+
+exports.handleRegister = (userName, callback) => {
   if (!clientManager.isUserAvailable(userName))
     return callback('user is not available');
 
@@ -6,9 +10,9 @@ function handleRegister(userName, callback) {
   clientManager.registerClient(client, user);
 
   return callback(null, user);
-}
+};
 
-function handleEvent(chatroomName, createEntry) {
+exports.handleEvent = (chatroomName, createEntry) => {
   return ensureValidChatroomAndUserSelected(chatroomName).then(function ({
     chatroom,
     user,
@@ -21,9 +25,9 @@ function handleEvent(chatroomName, createEntry) {
     chatroom.broadcastMessage({ chat: chatroomName, ...entry });
     return chatroom;
   });
-}
+};
 
-function handleJoin(chatroomName, callback) {
+exports.handleJoin = (chatroomName, callback) => {
   const createEntry = () => ({ event: `joined ${chatroomName}` });
 
   handleEvent(chatroomName, createEntry)
@@ -35,18 +39,11 @@ function handleJoin(chatroomName, callback) {
       callback(null, chatroom.getChatHistory());
     })
     .catch(callback);
-}
+};
 
-function handleDisconnect() {
+exports.handleDisconnect = () => {
   // remove user profile
   clientManager.removeClient(client);
   // remove member from all chatrooms
   chatroomManager.removeClient(client);
-}
-
-module.exports = {
-  handleRegister,
-  handleEvent,
-  handleJoin,
-  handleDisconnect,
 };
