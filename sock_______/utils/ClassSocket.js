@@ -2,46 +2,60 @@ const fs = require('fs');
 const http = require('http');
 // const https = require('https');
 const path = require('path');
+//  UTIL FXN
+const { getTalkHistory } = require('./dbAccess');
 
 class SockService {
   conorId = process.env.CONOR_ID;
-  users = [];
+  registry = []; //  [ {id: clientId, nsp: userId, room: talkId }]
+
   //    Admin
   connection(client) {
     // log event when user connected
-    console.log('frkn user connected');
-    // event fired when user is disconnected
-    client.on('disconnect', () => {
-      this.users = this.users.filter((user) => user.socketId !== client.id);
-    });
 
-    // add identity of user mapped to the socket id
-    client.on('identity', (userId) => {
-      this.users.push({
-        socketId: client.id,
-        userId: userId,
-      });
+    console.log(`Sock Class > .on('connection') >> `, client.id);
+
+    client.on('disconnect', () => {
+      console.log(`Sock Class > .on('disconnect') >> `, client.id);
     });
-    // subscribe person to chat & other user as well
-    client.on('subscribe', (room, otherUserId = '') => {
-      this.subscribeOtherUser(room, otherUserId);
-      client.join(room);
+    //~~~~~~~~~~~~~~~~~~
+    //  ROOMS
+    //~~~~~~~~~~~~~~~~~~
+    client.on('register', ({ userId, talkId }) => {
+      console.log(`Sock Class > .on('register', cb) > talkId: `, talkId);
+      client.join(talkId);
+      client.to(talkId).emit(`Welcome to ${talkId}`);
     });
     // mute a chat room
-    client.on('unsubscribe', (room) => {
-      client.leave(room);
+    client.on('leaveTalk', (talkId) => {
+      console.log(`Sock Class > .on('leaveTalk') >>`);
+      client.leave(talkId);
+      client.to(talkId).emit('user has left...');
     });
-  }
 
-  subscribeOtherUser(room, otherUserId) {
-    const userSockets = this.users.filter(
-      (user) => user.userId === otherUserId
-    );
-    userSockets.map((userInfo) => {
-      const socketConn = global.io.sockets.connected(userInfo.socketId);
-      if (socketConn) {
-        socketConn.join(room);
-      }
+    client.on('error', function (err) {
+      console.log(`Sock Class > .on('error') >> `, client.id);
+      console.log(err);
+    });
+
+    //~~~~~~~~~~~~~~~~~
+    //  DATA
+    //~~~~~~~~~~~~~~~~~
+    client.on('init-talk', async (talkId) => {
+      console.log(`Sock Class > on('init-talk') > talkId: `, talkId);
+      const talkObj = await getTalkHistory(talkId);
+      client.to(talkId).emit('init-talk', talkObj);
+    });
+    client.on('message', (msgObj) => {
+      console.log(
+        `Sock Class > client.to(${msgObj.talkId}).emit('message') >> '${msgObj.body.text}' `
+      );
+      client.to(msgObj.talkId).emit('message', msgObj);
+    });
+
+    client.on('note', ({ talkId, text }) => {
+      console.log(`Sock Class > on.('note') >>`);
+      client.to(talkId).emit('note', text);
     });
   }
 }

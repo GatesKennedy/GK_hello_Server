@@ -40,7 +40,6 @@ router.get('/', auth, async (request, response, next) => {
   try {
     const { rows } = await pool.query(queryText, [request.user.id]);
     console.log('Load Auth User > req.user.id: ', request.user.id);
-    console.log('Load Auth User > res.rows: ', rows);
 
     response.status(200).json(rows[0]);
   } catch (err) {

@@ -2,31 +2,28 @@
 //    Socket.io
 //~~~~~~~~~~~~~~~~~~~~~~~
 
-import serv from '../server.js';
-const ioC = require('socket.io')(serv);
-
-ioC.on('connection', function (client) {
-  console.log('frkn user connected');
+global.io.on('connection', (client) => {
+  console.log('frkn global user connected');
 
   client.emit('alert', 'oh goodness... there you are peter!');
 
   // client.emit('alert', 'oh goodness... there you are peter!');
 
-  client.on('register', handleRegister);
+  // client.on('register', handleRegister);
 
-  client.on('join', handleJoin);
+  // client.on('join', handleJoin);
 
-  client.on('leave', handleLeave);
+  // client.on('leave', handleLeave);
 
-  client.on('message', handleMessage);
+  // client.on('message', handleMessage);
 
-  client.on('chatrooms', handleGetChatrooms);
+  // client.on('chatrooms', handleGetChatrooms);
 
-  client.on('availableUsers', handleGetAvailableUsers);
+  // client.on('availableUsers', handleGetAvailableUsers);
 
   client.on('disconnect', function () {
-    console.log('frkn client disconnect...', client.id);
-    handleDisconnect();
+    console.log('frkn global client disconnect...', client.id);
+    // handleDisconnect();
   });
 
   client.on('error', function (err) {
@@ -34,5 +31,3 @@ ioC.on('connection', function (client) {
     console.log(err);
   });
 });
-
-module.exports = ioC;

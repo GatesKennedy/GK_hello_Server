@@ -54,15 +54,13 @@ serv.listen(PORT, () => {
 //    Socket.io
 //~~~~~~~~~~~~~~~~~~~~~~~
 
-// // Socket Init 3
-// // -------------
 //  import
 const SockService = require('./sock_______/utils/ClassSocket');
 const SocketIO = require('socket.io');
 //  init
 const sockServe = new SockService();
-global.io = SocketIO(serv);
-global.io.on('connection', sockServe.connection);
+io = SocketIO(serv);
+io.on('connection', sockServe.connection);
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    MIDDLEWARE

@@ -18,9 +18,8 @@ module.exports = function (req, res, next) {
   try {
     const decoded = jwt.verify(token, shhh);
     req.user = decoded.user;
-    console.log('Auth Middleware > ');
-    console.log('**** decoded.user: ', decoded.user);
-    console.log('**** req.user:     ', req.user);
+    // console.log('**** decoded.user: ', decoded.user);
+    // console.log('**** req.user:     ', req.user);
     next();
   } catch (err) {
     console.log('Auth Middleware > Catch');

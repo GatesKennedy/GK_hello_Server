@@ -112,6 +112,37 @@ GROUP BY
     GROUP BY talk_id
     ;
    
+--  GET Talk History
+     
+SELECT 
+    array_agg(json_build_object(
+        'msgId', tH.id,
+        'body', tH.body,
+        'send_id', tH.send_id, 
+        'seen', tH.seen,
+        'date_time', tH.date_time
+    )) AS 'msgObj',
+    tH.talk_id AS talkId
+FROM tbl_talk_history tH
+WHERE tH.talk_id = '178450d6-56a4-4e6b-884d-3db1bd4c67ab'
+GROUP BY talkId;
+-->>> RESULT >>>
+ {
+    "{
+     "msgId" : 1, 
+     "body" : {
+         "text": "Hello Coco, glad you could make it. (^=^)", 
+         "type": "chat"
+         }, 
+     "send_id" : "e732b2b4-2dc4-447b-b145-b7a9a5c1255a", 
+     "seen" : true, 
+     "date_time" : "2020-09-19T21:15:14.277232-07:00"
+    }",
+ }     
+
+
+
+
 
 --  Add text content
 INSERT INTO tbl_talk_history
