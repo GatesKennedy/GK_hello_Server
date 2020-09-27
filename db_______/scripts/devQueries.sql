@@ -113,7 +113,7 @@ GROUP BY
     ;
    
 --  GET Talk History
-     
+
 SELECT 
     array_agg(json_build_object(
         'msgId', tH.id,
@@ -158,4 +158,46 @@ VALUES
 UPDATE tbl_user
 SET role = 'admin'
 WHERE name = 'BadBoy'
+;
+
+-------------------------
+-------------------------     
+SELECT 
+    json_build_object(
+        'id', tH.id,
+        'body', tH.body,
+        'send_id', tH.send_id, 
+        'seen', tH.seen,
+        'date_time', tH.date_time
+    ) AS msgObj,
+    tH.talk_id AS talk_id
+FROM tbl_talk_history tH
+INNER JOIN tbl_access tA
+    on tA.talk_id = tH.talk_id
+WHERE tA.user_id = 'e732b2b4-2dc4-447b-b145-b7a9a5c1255a'
+GROUP BY tH.talk_id
+
+-----------------------------------
+
+WITH tbl_msgs AS (
+    SELECT 
+        json_build_object(
+            'id', tH.id,
+            'body', tH.body,
+            'send_id', tH.send_id, 
+            'seen', tH.seen,
+            'date_time', tH.date_time
+        ) AS msgObj,
+        tH.talk_id AS talk_id
+    FROM tbl_talk_history tH
+    INNER JOIN tbl_access tA
+        on tA.talk_id = tH.talk_id
+    WHERE tA.user_id = 'e732b2b4-2dc4-447b-b145-b7a9a5c1255a'
+    )
+SELECT
+    talk_id,
+    array_agg(msgObj) AS msgObj
+FROM tbl_msgs 
+GROUP BY talk_id
+ORDER BY msgObj.date_time
 ;

@@ -109,9 +109,13 @@ router.get('/history', auth, async (request, response, next) => {
         )
     SELECT
         talk_id,
-        array_agg(msgObj) AS msgObj
+        array_agg(
+          msgObj
+          ORDER BY msgObj->>'date_time'
+          ) AS msgObj
     FROM tbl_msgs 
     GROUP BY talk_id
+    
     ;
     `;
   try {
