@@ -196,8 +196,10 @@ WITH tbl_msgs AS (
     )
 SELECT
     talk_id,
-    array_agg(msgObj) AS msgObj
+    array_agg(
+        msgObj
+        ORDER BY msgObj->>'date_time'
+        ) AS msglist
 FROM tbl_msgs 
 GROUP BY talk_id
-ORDER BY msgObj.date_time
 ;
