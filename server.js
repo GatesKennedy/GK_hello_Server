@@ -71,10 +71,13 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const { AWS_FILE_SIZE } = process.env;
+const { secureRedirectHerokuMW } = require('./api_______/middleware/security');
 //  init
 app.use(bodyParser.json());
 app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
+const dev = NODE_ENV === 'development';
+app.use(secureRedirectHerokuMW({ NodeEnv: dev }));
 app.use(
   fileUpload({
     createParentPath: true,
