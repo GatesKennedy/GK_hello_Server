@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 //  MID
 const auth = require('../middleware/auth');
+const { validateToken } = require('../middleware/auth');
 const pool = require('../../db_______/db');
 //  ENV
 const shhh = process.env.JWT_SHHH;
@@ -19,7 +20,7 @@ const router = express.Router();
 //  @route      GET api/note/
 //  @desc       AUTH Token | LOAD User Notes
 //  @access     PRIVATE
-router.get('/', auth, async (request, response, next) => {
+router.get('/', validateToken, async (request, response, next) => {
   console.log('(^=^) GET: api/note/ > LOAD NOTES >  Enter FXN');
 
   try {

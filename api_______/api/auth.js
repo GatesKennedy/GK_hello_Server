@@ -5,7 +5,8 @@ const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 //  MID
-const auth = require('../middleware/auth');
+// const auth = require('../middleware/auth');
+const { validateToken } = require('../middleware/auth');
 const pool = require('../../db_______/db');
 //  ENV
 const shhh = process.env.JWT_SHHH;
@@ -16,7 +17,7 @@ const router = express.Router();
 //  @route      GET api/auth
 //  @desc       AUTH Token | AUTH User
 //  @access     PRIVATE
-router.get('/', auth, async (request, response, next) => {
+router.get('/', validateToken, async (request, response, next) => {
   console.log('(^=^) AUTH USER > GET: api/auth/ > Enter FXN');
   const id = request.user.id;
   console.log('(^=^) AUTH USER > GET: api/auth/ > user_id: ', id);

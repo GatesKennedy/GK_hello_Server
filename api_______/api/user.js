@@ -5,12 +5,14 @@ const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 //  MID
-const auth = require('../middleware/auth');
+// const auth = require('../middleware/auth');
+const { validateToken } = require('../middleware/auth');
 const pool = require('../../db_______/db');
 //  ENV
 const shhh = process.env.JWT_SHHH;
 
 const router = express.Router();
+
 //  =============
 //  ==   GET   ==
 //  =============
@@ -19,7 +21,7 @@ const router = express.Router();
 //  @route      GET api/user/
 //  @desc       AUTH Token | LOAD User
 //  @access     PRIVATE
-router.get('/', auth, async (request, response, next) => {
+router.get('/', validateToken, async (request, response, next) => {
   console.log('(^=^) GET: api/auth/ > LOAD USER >  Enter FXN');
   const queryText = `
       SELECT 
@@ -56,40 +58,5 @@ router.get('/', auth, async (request, response, next) => {
 //  @route      POST api/user/login/
 //  @desc       LOGIN-AUTH User | GET Token
 //  @access     PUBLIC
-
-//============================================================
-//============================================================
-
-//  TEST ROUTE NO DB
-//  @route      GET api/user/sars
-//  @desc       respond "Oh, hello there."
-//  @access     PUBLIC
-router.get('/sars', async (request, response, next) => {
-  const testString = 'oh, hello there.';
-  //  Response
-  return response.status(200).send(testString);
-});
-
-//  TEST ROUTE with DB
-//  @route      GET api/user/db
-//  @desc       respond "list of all artists"
-//  @access     PUBLIC
-router.get('/db', async (request, response, next) => {
-  const queryText = `
-    SELECT 
-      name,
-      role
-    FROM tbl_user;
-    `;
-  try {
-    const res = await pool.query(queryText);
-    //  Response
-    return response.status(200).json(res.rows);
-  } catch (err) {
-    console.error('(>_<) test.js > catch > err: ' + err);
-    response.status(500).send('Server error');
-    return next(err);
-  }
-});
 
 module.exports = router;

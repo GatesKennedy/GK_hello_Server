@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { json } = require('express');
 const shhh = process.env.JWT_SHHH;
 
-module.exports = function (req, res, next) {
+const validateToken = (req, res, next) => {
   console.log('Auth Middleware > authenticate user > enter fxn');
   //  Get token from header
   const token = req.header('x-auth-token');
@@ -30,4 +30,8 @@ module.exports = function (req, res, next) {
     });
     return next(err);
   }
+};
+
+module.exports = {
+  validateToken,
 };

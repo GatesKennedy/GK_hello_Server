@@ -2,7 +2,8 @@
 const express = require('express');
 //  Socket.io
 //  MID
-const auth = require('../middleware/auth');
+// const auth = require('../middleware/auth');
+const { validateToken } = require('../middleware/auth');
 const pool = require('../../db_______/db');
 //  ENV
 
@@ -15,7 +16,7 @@ const router = express.Router();
 //  @route      GET api/talk/
 //  @desc       AUTH Token | LOAD User Chats
 //  @access     PRIVATE
-router.get('/', auth, async (request, response, next) => {
+router.get('/', validateToken, async (request, response, next) => {
   console.log('(^=^) GET: api/talk/ > LOAD CHATS >  Enter FXN');
   const id = request.user.id;
   const queryText = `
@@ -63,7 +64,7 @@ router.get('/', auth, async (request, response, next) => {
 //  @route      POST api/talk/
 //  @desc       AUTH User | POST Chat Message
 //  @access     PRIVATE
-router.post('/', auth, async (request, response, next) => {
+router.post('/', validateToken, async (request, response, next) => {
   console.log('(^=^) GET: api/talk/ > POST CHAT >  Enter FXN');
   const { id, talkId, body } = request.body;
   const queryText = `
@@ -87,7 +88,7 @@ router.post('/', auth, async (request, response, next) => {
 //  @route      GET api/talk/hist
 //  @desc       AUTH Token | LOAD User Chats
 //  @access     PRIVATE
-router.get('/history', auth, async (request, response, next) => {
+router.get('/history', validateToken, async (request, response, next) => {
   console.log('(^=^) GET: api/talk/history >  Enter FXN');
   const id = request.user.id;
   const queryText = `
@@ -126,7 +127,7 @@ router.get('/history', auth, async (request, response, next) => {
 //  @route      GET api/talk/hist
 //  @desc       AUTH Token | LOAD User Chats
 //  @access     PRIVATE
-router.post('/hist', auth, async (request, response, next) => {
+router.post('/hist', validateToken, async (request, response, next) => {
   console.log('(^=^) GET: api/talk/ > LOAD CHATS >  Enter FXN');
   const id = request.user.id;
   const queryText = `
