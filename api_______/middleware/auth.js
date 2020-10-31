@@ -16,10 +16,10 @@ const validateToken = (req, res, next) => {
   }
   //  Verify token
   try {
-    const decoded = jwt.verify(token, shhh);
+    let decoded = jwt.verify(token, shhh);
+    console.log('**** decoded.user: ', decoded.user);
+    console.log('**** req.user:     ', req.user);
     req.user = decoded.user;
-    // console.log('**** decoded.user: ', decoded.user);
-    // console.log('**** req.user:     ', req.user);
     next();
   } catch (err) {
     console.log('Auth Middleware > Catch');
