@@ -88,7 +88,7 @@ app.use(
     preserveExtension: true,
   })
 );
-
+//  ~~  CORS  ~~
 app.use(cors());
 let whitelist = [
   process.env.CLIENT_ORIGIN_DEV,
