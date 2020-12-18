@@ -29,7 +29,9 @@ const PORT = process.env.PORT || 5000;
 const serv = http.createServer(app);
 
 if (NODE_ENV === 'production') {
-  app.use(enforce.HTTPS({ trustProtoHeader: true })); // Use enforce.HTTPS({ trustProtoHeader: true }) in case you are behind a load balancer (e.g. Heroku). See further comments below > [https://www.npmjs.com/package/express-sslify]
+  app.use(enforce.HTTPS({ trustProtoHeader: true }));
+  //  Use enforce.HTTPS({ trustProtoHeader: true }) in case you are behind a load balancer (e.g. Heroku).
+  //  See further comments below > [https://www.npmjs.com/package/express-sslify]
 }
 
 serv.listen(PORT, () => {
