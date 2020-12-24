@@ -3,7 +3,7 @@ const { json } = require('express');
 const shhh = process.env.JWT_SHHH;
 
 const validateToken = (req, res, next) => {
-  console.log('Auth Middleware > authenticate user > enter fxn');
+  console.log('Auth Middleware > validateToken() > enter fxn');
   //  Get token from header
   const token = req.header('x-auth-token');
 

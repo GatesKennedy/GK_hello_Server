@@ -1,17 +1,16 @@
 //  EXPRESS
 const express = require('express');
+const router = express.Router();
 const { check, validationResult } = require('express-validator');
 //  TOOL/PKG
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 //  MID
-// const auth = require('../middleware/auth');
 const { validateToken } = require('../middleware/auth');
 const pool = require('../../db_______/db');
+const cors = require('cors');
 //  ENV
 const shhh = process.env.JWT_SHHH;
-
-const router = express.Router();
 
 //  AUTH USER
 //  @route      GET api/auth
@@ -82,14 +81,15 @@ router.post(
   ],
   async (request, response, next) => {
     console.log('(^=^) Enter FXN > POST: api/auth/login');
-    const { emailIn, passwordIn } = request.body;
-    const emailLower = emailIn.toLowerCase();
-    console.log('=========== begin processing ===========');
     //~~~~~~~~~~~~~~~~~~~~~~~~~
     //  Async db Connection
     const client = await pool.connect();
 
     try {
+      console.log(`request.body = `, request.body);
+      const { emailIn, passwordIn } = request.body;
+      const emailLower = emailIn.toLowerCase();
+      console.log('=========== begin processing ===========');
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Check Input
       const errors = validationResult(request);

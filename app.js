@@ -24,28 +24,30 @@ class AppError extends Error {
 const express = require('express');
 const app = express();
 
-//~~~~~~~~~~~~~~~~~~~~~~~
-//      ROUTES
-//~~~~~~~~~~~~~~~~~~~~~~~
-//  import
-const sock = require(`./sock_______/api/sock`);
-const auth = require('./api_______/api/auth');
-const user = require('./api_______/api/user');
-const talk = require('./api_______/api/talk');
-const chat = require('./api_______/api/chat');
-const note = require('./api_______/api/note');
-const aws = require('./aws_______/api/action');
-//  init
-app.use('/api/auth', auth);
-app.use('/api/user', user);
-app.use('/api/sock', sock);
-app.use('/api/talk', talk);
-app.use('/api/chat', chat);
-app.use('/api/note', note);
-app.use('/api/aws', aws);
-app.all('*', (req, res, next) => {
-  next(new AppError(`Oops.. ${req.originalUrl} is not for you!`, 404));
-});
+//  ~~~~~~~~~~~~
+//  ~~  CORS  ~~
+const cors = require('cors');
+// app.use(cors());
+let whitelist = [
+  process.env.CLIENT_ORIGIN_DEV,
+  process.env.CLIENT_ORIGIN_STAGE,
+  process.env.CLIENT_ORIGIN_GK,
+  process.env.CLIENT_ORIGIN_CONOR,
+];
+let corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.options('*', cors(corsOptions)); // include before other routes
+app.use(cors(corsOptions));
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    MIDDLEWARE
@@ -54,10 +56,6 @@ app.all('*', (req, res, next) => {
 //  express
 app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
-
-//  bodyParser
-const bodyParser = require('body-parser');
-app.use(bodyParser.json());
 
 //  express-sslify
 const enforce = require('express-sslify');
@@ -86,30 +84,6 @@ const { secureRedirectHerokuMW } = require('./api_______/middleware/security');
 const dev = NODE_ENV === 'development';
 app.use(secureRedirectHerokuMW({ NodeEnv: dev }));
 
-//  ~~~~~~~~~~~~
-//  ~~  CORS  ~~
-const cors = require('cors');
-app.use(cors());
-let whitelist = [
-  process.env.CLIENT_ORIGIN_DEV,
-  process.env.CLIENT_ORIGIN_STAGE,
-  process.env.CLIENT_ORIGIN_GK,
-  process.env.CLIENT_ORIGIN_CONOR,
-];
-let corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
-app.options('/api/aws', cors(corsOptions)); // include before other routes
-app.use(cors(corsOptions));
-
 //  validate Token
 // const { validateToken } = require('./api_______/middleware/auth');
 // app.use(validateToken)
@@ -135,6 +109,29 @@ app.use((err, req, res, next) => {
   } else if (process.env.NODE_ENV === 'production') {
     sendErrorProd(err, res);
   }
+});
+
+//~~~~~~~~~~~~~~~~~~~~~~~
+//      ROUTES
+//~~~~~~~~~~~~~~~~~~~~~~~
+//  import
+const sock = require(`./sock_______/api/sock`);
+const auth = require('./api_______/api/auth');
+const user = require('./api_______/api/user');
+const talk = require('./api_______/api/talk');
+const chat = require('./api_______/api/chat');
+const note = require('./api_______/api/note');
+const aws = require('./aws_______/api/action');
+//  init
+app.use('/api/auth', auth);
+app.use('/api/user', user);
+app.use('/api/sock', sock);
+app.use('/api/talk', talk);
+app.use('/api/chat', chat);
+app.use('/api/note', note);
+app.use('/api/aws', aws);
+app.all('*', (req, res, next) => {
+  next(new AppError(`Oops.. ${req.originalUrl} is not for you!`, 404));
 });
 
 //~~~~~~~~~~~~~~~~~~~~~~~
