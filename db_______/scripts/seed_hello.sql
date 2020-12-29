@@ -105,5 +105,9 @@ CREATE INDEX idx_genre       ON tbl_access                   (user_id);
 --  psql -U ohnodamn -d db_hello -f C:\Programming\Gates_Kennedy\GK_hello\GK_hello_Server\db_______\scripts\seed_hello.sql
 --  ~Heroku~
 --  Not Connected to Heroku psql:
+--      GENERAL
 --      cat <file_name> | heroku pg:psql
+--      DEFAULT
 --      cat C:\Programming\Gates_Kennedy\GK_hello\GK_hello_Server\db_______\scripts\seed_hello.sql | heroku pg:psql
+--      STAGING
+--      cat C:\Programming\Gates_Kennedy\GK_hello\GK_hello_Server\db_______\scripts\seed_hello.sql | heroku pg:psql -a gk-hello-server--staging
