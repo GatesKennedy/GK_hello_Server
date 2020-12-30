@@ -75,6 +75,7 @@ router.get('/', validateToken, async (request, response, next) => {
 //  @access     PUBLIC
 router.post(
   '/login',
+  cors(),
   [
     check('emailIn').isEmail().withMessage('Please include a valid email'),
     check('passwordIn').exists().withMessage('Password is required'),
