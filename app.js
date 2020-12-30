@@ -73,7 +73,7 @@ switch (process.env.NODE_ENV) {
 // app.options('*', cors(corsOptions)); // enable pre-flight for all, include before other routes
 // app.use(cors(corsOptions));
 
-app.options('*', cors()); // enable pre-flight for all, include before other routes
+// app.options('*', cors()); // enable pre-flight for all, include before other routes
 app.use(cors());
 
 //~~~~~~~~~~~~~~~~~~~~~~~

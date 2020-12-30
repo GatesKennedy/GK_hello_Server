@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 //  MID
 const { validateToken } = require('../middleware/auth');
 const pool = require('../../db_______/db');
-const cors = require('cors');
+
 //  ENV
 const shhh = process.env.JWT_SHHH;
 
@@ -75,7 +75,6 @@ router.get('/', validateToken, async (request, response, next) => {
 //  @access     PUBLIC
 router.post(
   '/login',
-  cors(),
   [
     check('emailIn').isEmail().withMessage('Please include a valid email'),
     check('passwordIn').exists().withMessage('Password is required'),
