@@ -33,7 +33,6 @@ let whitelist = [
   process.env.CLIENT_ORIGIN_STAGE,
   process.env.CLIENT_ORIGIN_GK,
   process.env.CLIENT_ORIGIN_CONOR,
-  process.env.CLIENT_ORIGIN_CONOR2,
 ];
 let envOrigin;
 switch (process.env.NODE_ENV) {
