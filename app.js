@@ -64,14 +64,15 @@ switch (process.env.NODE_ENV) {
 //   // allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
 //   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 // };
-let corsOptions = {
-  origin: envOrigin,
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  // allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
+// let corsOptions = {
+//   origin: envOrigin,
+//   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+//   // allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+//   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+// };
 // app.options('*', cors(corsOptions)); // enable pre-flight for all, include before other routes
 // app.use(cors(corsOptions));
+
 app.options('*', cors()); // enable pre-flight for all, include before other routes
 app.use(cors());
 
