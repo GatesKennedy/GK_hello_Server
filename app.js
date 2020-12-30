@@ -48,7 +48,7 @@ switch (process.env.NODE_ENV) {
     break;
 
   default:
-    envOrigin = 'http://localhost:3000';
+    envOrigin = process.env.CLIENT_ORIGIN_STAGE;
     break;
 }
 
