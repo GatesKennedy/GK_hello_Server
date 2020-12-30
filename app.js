@@ -35,19 +35,42 @@ let whitelist = [
   process.env.CLIENT_ORIGIN_CONOR,
   process.env.CLIENT_ORIGIN_CONOR2,
 ];
+let envOrigin;
+switch (process.env.NODE_ENV) {
+  case 'development':
+    envOrigin = process.env.CLIENT_ORIGIN_DEV;
+    break;
+  case 'staging':
+    envOrigin = process.env.CLIENT_ORIGIN_STAGE;
+    break;
+  case 'production':
+    envOrigin = process.env.CLIENT_ORIGIN_CONOR;
+    break;
+
+  default:
+    envOrigin = 'http://localhost:3000';
+    break;
+}
+
+// let corsOptions = {
+//   origin: function (origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1 || !origin) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+//   // allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+//   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+// };
 let corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: envOrigin,
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+  // allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
-app.options('*', cors(corsOptions)); // include before other routes
+app.options('*', cors(corsOptions)); // enable pre-flight for all, include before other routes
 app.use(cors(corsOptions));
 
 //~~~~~~~~~~~~~~~~~~~~~~~
