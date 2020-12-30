@@ -33,6 +33,7 @@ let whitelist = [
   process.env.CLIENT_ORIGIN_STAGE,
   process.env.CLIENT_ORIGIN_GK,
   process.env.CLIENT_ORIGIN_CONOR,
+  process.env.CLIENT_ORIGIN_CONOR2,
 ];
 let corsOptions = {
   origin: function (origin, callback) {
