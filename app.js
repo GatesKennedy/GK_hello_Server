@@ -64,17 +64,17 @@ switch (process.env.NODE_ENV) {
 //   // allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
 //   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 // };
-// let corsOptions = {
-//   origin: envOrigin,
-//   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-//   // allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
-//   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-// };
+let corsOptions = {
+  origin: envOrigin,
+  // methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  // allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
 // app.options('*', cors(corsOptions)); // enable pre-flight for all, include before other routes
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 // app.options('*', cors()); // enable pre-flight for all, include before other routes
-app.use(cors());
+// app.use(cors());
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    MIDDLEWARE
@@ -172,15 +172,17 @@ serv.listen(PORT, () => {
   if (NODE_ENV === 'production') {
     console.log(`
     ~~~~~~~~~ server.js ~~~~~~~~~
-    (^=^)  listening on port ${PORT}
+    (^=^)  production listening on port ${PORT}
             Secure: https
+            Origin: ${envOrigin}
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     `);
   } else if (NODE_ENV === 'development') {
     console.log(`
     ~~~~~~~~~ server.js ~~~~~~~~~
-    (^=^)  listening on port ${PORT}
+    (^=^)  development listening on port ${PORT}
             Insecure: http
+            Origin: ${envOrigin}
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     `);
   }
