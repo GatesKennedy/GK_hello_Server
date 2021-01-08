@@ -34,6 +34,8 @@ router.get('/', validateToken, async (request, response, next) => {
         p.website,
         p.thought,
         p.puzzle,
+        p.joke,
+        p.question,
         p.img_url,
         p.location
       FROM tbl_user AS u
