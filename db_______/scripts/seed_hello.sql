@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS tbl_profile(
     website         VARCHAR(128),
     thought         VARCHAR,
     puzzle          TEXT,
+    joke            TEXT,
+    question        TEXT,
     img_url         TEXT,
     location        VARCHAR(50)
 );
