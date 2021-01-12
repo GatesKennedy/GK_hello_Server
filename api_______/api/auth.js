@@ -20,8 +20,6 @@ const shhh = process.env.JWT_SHHH;
 router.get('/', validateToken, async (request, response, next) => {
   console.log('(^=^) AUTH USER > GET: api/auth/ > Enter FXN');
   const id = request.user.id;
-  console.log('(^=^) AUTH USER > GET: api/auth/ > user_id: ', id);
-
   const queryText = `
       SELECT 
         id, 
@@ -82,12 +80,12 @@ router.post(
   ],
   async (request, response, next) => {
     console.log('(^=^) Enter FXN > POST: api/auth/login');
-    //~~~~~~~~~~~~~~~~~~~~~~~~~
-    //  Async db Connection
-    const client = await pool.connect();
 
     try {
-      console.log(`request.body = `, request.body);
+      //~~~~~~~~~~~~~~~~~~~~~~~~~
+      //  Async db Connection
+      const client = await pool.connect();
+      console.log(`POST: api/auth/login > Connected To Pool`);
       const { emailIn, passwordIn } = request.body;
       const emailLower = emailIn.toLowerCase();
       console.log('=========== begin processing ===========');
