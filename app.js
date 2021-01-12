@@ -80,7 +80,7 @@ app.options('/api/auth/login', cors(corsOptions), (req, res, next) => {
 // app.use(cors(corsOptions));
 
 // app.options('*', cors()); // enable pre-flight for all, include before other routes
-// app.use(cors());
+app.use(cors());
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    MIDDLEWARE
