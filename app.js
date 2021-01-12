@@ -79,7 +79,7 @@ let corsOptions = {
 // });
 // app.use(cors(corsOptions));
 
-app.options('*', cors()); // enable pre-flight for all, include before other routes
+// app.options('*', cors()); // enable pre-flight for all, include before other routes
 app.use(cors());
 
 //~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,6 +155,8 @@ const talk = require('./api_______/api/talk');
 const chat = require('./api_______/api/chat');
 const note = require('./api_______/api/note');
 const aws = require('./aws_______/api/action');
+const test = require('./api_______/api/test');
+// const test = require('./api/______/api/test');
 //  init
 app.use('/api/auth', auth);
 app.use('/api/user', user);
@@ -163,6 +165,7 @@ app.use('/api/talk', talk);
 app.use('/api/chat', chat);
 app.use('/api/note', note);
 app.use('/api/aws', aws);
+app.use('/api/test', test);
 app.all('*', (req, res, next) => {
   next(new AppError(`Oops.. ${req.originalUrl} is not for you!`, 404));
 });
