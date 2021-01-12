@@ -77,10 +77,16 @@ let corsOptions = {
 //       envOrigin: ${envOrigin}`,
 //   });
 // });
-// app.use(cors(corsOptions));
+app.options('/api/test', cors(corsOptions), (req, res, next) => {
+  res.json({
+    msg: `'CORS-enabled Pre-Flight'
+      envOrigin: ${envOrigin}`,
+  });
+});
+app.use(cors(corsOptions));
 
 // app.options('*', cors()); // enable pre-flight for all, include before other routes
-app.use(cors());
+// app.use(cors());
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    MIDDLEWARE
