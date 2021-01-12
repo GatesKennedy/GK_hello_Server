@@ -2,13 +2,13 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
+//  MID
 const cors = require('cors');
+const { validateToken } = require('../middleware/auth');
+const pool = require('../../db_______/db');
 //  TOOL/PKG
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-//  MID
-const { validateToken } = require('../middleware/auth');
-const pool = require('../../db_______/db');
 
 //  ENV
 const shhh = process.env.JWT_SHHH;

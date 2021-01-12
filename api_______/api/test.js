@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+//  MID
 const cors = require('cors');
+const pool = require('../../db_______/db');
 const { validateToken } = require('../middleware/auth');
 //-----------
 const { NODE_ENV } = process.env;
@@ -15,14 +17,14 @@ router.get('/', (req, res, next) => {
 
 router.get('/db-async', async (request, response, next) => {
   console.log('(^=^) Enter FXN > GET: api/test/db-async');
+  //  Async db Connection
+  const client = await pool.connect();
   try {
-    //  Async db Connection
-    const client = await pool.connect();
     const queryText = `
-  SELECT
-   *
-  FROM tbl_user 
-  LIMIT 1
+      SELECT
+      *
+      FROM tbl_user 
+      LIMIT 1
   `;
     const { rows } = await client.query(queryText);
     await client.query('COMMIT');
