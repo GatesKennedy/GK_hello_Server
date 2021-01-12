@@ -70,17 +70,17 @@ let corsOptions = {
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 //  CORS - Pre-Flight
-// app.options('*', cors(corsOptions)); // enable pre-flight for all, include before other routes
+app.options('*', cors(corsOptions)); // enable pre-flight for all, include before other routes
 // app.options('/api/auth/login', cors(corsOptions), (req, res, next) => {
 //   res.json({
 //     msg: `'CORS-enabled Pre-Flight'
 //       envOrigin: ${envOrigin}`,
 //   });
 // });
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 // app.options('*', cors()); // enable pre-flight for all, include before other routes
-app.use(cors());
+// app.use(cors());
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    MIDDLEWARE
