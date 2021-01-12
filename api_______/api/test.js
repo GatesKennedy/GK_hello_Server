@@ -18,7 +18,9 @@ router.get('/', (req, res, next) => {
 router.get('/db-async', async (request, response, next) => {
   console.log('(^=^) Enter FXN > GET: api/test/db-async');
   //  Async db Connection
-  const client = await pool.connect();
+  const client = await pool
+    .connect()
+    .catch((err) => console.error('Error connecting to Pool', err.stack));
   try {
     const queryText = `
       SELECT

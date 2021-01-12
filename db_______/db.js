@@ -4,9 +4,9 @@ const { Pool } = require('pg');
 const envStr = JSON.stringify(process.env.NODE_ENV);
 const { DATABASE_URL, DB_USER, DB_NAME, DB_PASS } = process.env;
 const cxnStr =
-  process.env.NODE_ENV == 'production'
-    ? DATABASE_URL
-    : `postgresql://${DB_USER}:${DB_PASS}@${DATABASE_URL}/${DB_NAME}`;
+  process.env.NODE_ENV == 'development'
+    ? `postgresql://${DB_USER}:${DB_PASS}@${DATABASE_URL}/${DB_NAME}`
+    : DATABASE_URL;
 
 const pool = new Pool({
   connectionString: cxnStr,
