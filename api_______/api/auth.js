@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
+const cors = require('cors');
 //  TOOL/PKG
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');

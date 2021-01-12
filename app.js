@@ -71,15 +71,15 @@ let corsOptions = {
 };
 //  CORS - Pre-Flight
 // app.options('*', cors(corsOptions)); // enable pre-flight for all, include before other routes
-app.options('/api/auth/login', cors(corsOptions), (req, res, next) => {
-  res.json({
-    msg: `'CORS-enabled Pre-Flight' 
-      envOrigin: ${envOrigin}`,
-  });
-});
+// app.options('/api/auth/login', cors(corsOptions), (req, res, next) => {
+//   res.json({
+//     msg: `'CORS-enabled Pre-Flight'
+//       envOrigin: ${envOrigin}`,
+//   });
+// });
 // app.use(cors(corsOptions));
 
-// app.options('*', cors()); // enable pre-flight for all, include before other routes
+app.options('*', cors()); // enable pre-flight for all, include before other routes
 app.use(cors());
 
 //~~~~~~~~~~~~~~~~~~~~~~~
