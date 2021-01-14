@@ -18,8 +18,8 @@ const shhh = process.env.JWT_SHHH;
 //  @desc       AUTH Token | AUTH User
 //  @access     PRIVATE
 router.get('/', validateToken, async (request, response, next) => {
-  console.log('(^=^) AUTH USER > GET: api/auth/ > Enter FXN');
   const id = request.user.id;
+
   const queryText = `
       SELECT 
         id, 
@@ -40,7 +40,6 @@ router.get('/', validateToken, async (request, response, next) => {
         },
       };
       jwt.sign(payload, shhh, { expiresIn: 18000 }, (err, token) => {
-        console.log('(^=^) AUTH USER > GET: api/auth/ > jwt.sign...');
         if (err) throw err;
         role === 'admin'
           ? response.json({
@@ -79,21 +78,18 @@ router.post(
     check('passwordIn').exists().withMessage('Password is required'),
   ],
   async (request, response, next) => {
-    console.log('(^=^) Enter FXN > POST: api/auth/login');
+    //~~~~~~~~~~~~~~~~~~~~~~~~~
+    //  Async db Connection
+    const client = await pool.connect();
 
     try {
-      //~~~~~~~~~~~~~~~~~~~~~~~~~
-      //  Async db Connection
-      const client = await pool.connect();
-      console.log(`POST: api/auth/login > Connected To Pool`);
       const { emailIn, passwordIn } = request.body;
       const emailLower = emailIn.toLowerCase();
-      console.log('=========== begin processing ===========');
+
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Check Input
       const errors = validationResult(request);
       if (!errors.isEmpty()) {
-        console.log('(>_<) FAIL Validation > errors: ', errors);
         return response.status(422).json({
           errors: errors.array(),
           valid: false,
@@ -114,26 +110,23 @@ router.post(
         `;
       const { rows } = await client.query(queryText, [emailLower]);
       if (!rows.length > 0) {
-        console.log('#####  |   (>_<) LOGIN USER > NO Email : FAIL');
         return response.status(400).json({
           errors: [{ msg: 'oops.. wrong email' }],
           msg: 'msg: email not found...',
         });
       }
       const { id, name, password, role } = rows[0];
-      console.log('(o_O) LOGIN USER > Email Exists: PASS');
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Check Password
       const isMatch = await bcrypt.compare(passwordIn, password);
       if (!isMatch) {
-        console.log('#####  |   (>_<) LOGIN USER > NO Password : FAIL');
         return response.status(400).json({
           errors: [{ msg: 'oops.. wrong password' }],
           msg: 'msg: wrong password',
         });
       }
-      console.log('(o_O) LOGIN USER > Password Matches: PASS');
+
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Return JWT
       const payload = {
@@ -141,10 +134,10 @@ router.post(
           id: id,
         },
       };
-      console.log('(o_O) LOGIN USER > AuthUser ID = ', id);
+
       jwt.sign(payload, shhh, { expiresIn: 18000 }, (err, token) => {
         if (err) throw err;
-        console.log('(o_O) LOGIN USER > tokenLoad: ', token);
+
         role === 'admin'
           ? response
               .json({
@@ -166,13 +159,11 @@ router.post(
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  COMMIT
       await client.query('COMMIT');
-      console.log('(^=^) LOGIN USER > DONE');
 
       //=============
       //  CATCH
     } catch (err) {
       const errStr = JSON.stringify(err);
-      console.log('|     (>_<) LOGIN USER > FAIL Catch > errStr: ', errStr);
       await client.query('ROLLBACK');
       return next(err);
     } finally {
@@ -196,10 +187,9 @@ router.post(
     }),
   ],
   async (request, response, next) => {
-    console.log('(^=^) POST: api/auth/register > REGISTER USER > Enter FXN');
     const { username, email, password, role } = request.body;
     const emailLow = email.toLowerCase();
-    console.log('=========== begin processing ===========');
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~
     //  Async db Connection
     const client = await pool.connect();
@@ -208,7 +198,6 @@ router.post(
       //  Check Input
       const errors = validationResult(request);
       if (!errors.isEmpty()) {
-        console.log('#####  |   (>_<) fail validation > errors: ', errors);
         return response.status(422).json({
           errors: errors.array(),
           valid: false,
@@ -217,7 +206,6 @@ router.post(
       }
 
       //  No More Admin
-      console.log('#####  |   (>_<) fail No More Admin > errors: ', errors);
       if (role === 'admin') {
         return response
           .status(400)
@@ -243,12 +231,10 @@ router.post(
         });
         //  !!! error response !!!
       }
-      console.log('>Email');
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  @ PASSWORD
       const salt = await bcrypt.genSalt(10);
       const pwCrypt = await bcrypt.hash(password, salt);
-      console.log('>Password', pwCrypt);
       //  Get Admin
       const adminText = `
         SELECT id
@@ -267,7 +253,6 @@ router.post(
         RETURNING id, name, role`;
       const userValues = [username, email, pwCrypt, dynRole];
       const resUser = await client.query(userText, userValues);
-      console.log('>INSERT\n', resUser.rows[0]);
       const userId = resUser.rows[0].id;
       //~~~~~~~~~~~~~~~~~~~~~~~~~
       //  Create Profile
@@ -279,7 +264,6 @@ router.post(
 
       if (resAdmin.rows.length > 0) {
         const conorId = resAdmin.rows[0].id;
-        console.log('>conorId: ', conorId);
         //  Create Chat
         const chatText = `
             INSERT INTO tbl_talk(type)
@@ -288,7 +272,6 @@ router.post(
       `;
         const resChat = await client.query(chatText, ['chat']);
         const chatId = resChat.rows[0].id;
-        console.log('>CHAT');
 
         //  Create Access
         const accessText = `
@@ -298,7 +281,6 @@ router.post(
                 ($3, $2);
       `;
         await client.query(accessText, [userId, chatId, conorId]);
-        console.log('>ACCESS');
 
         //  Create History
         const initText = `
@@ -318,7 +300,6 @@ router.post(
           body,
           'init',
         ]);
-        console.log('>HISTORY INIT \n', resInit.rows[0]);
 
         //  New Chat Notification
         if (resInit.rows[0].edit_note === 'init') {
@@ -342,9 +323,7 @@ router.post(
           .json({ token: token, user: { userName: username } })
           .redirect('/talk');
       });
-      console.log('>JWT');
       await client.query('COMMIT');
-      console.log('(^=^) REGISTER USER > DONE');
       //~~~~~~~~~~~~~~~~~~~~~
     } catch (err) {
       //  Catch
