@@ -47,7 +47,7 @@ switch (process.env.NODE_ENV) {
     break;
 
   default:
-    envOrigin = process.env.CLIENT_ORIGIN_STAGE;
+    envOrigin = process.env.CLIENT_ORIGIN_CONOR;
     break;
 }
 
@@ -132,8 +132,6 @@ const {
 } = require('./api_______/middleware/errorGen');
 //  init
 app.use((err, req, res, next) => {
-  console.log(`OOPS > NEXT FXN >`);
-
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'Oops.. error';
 
