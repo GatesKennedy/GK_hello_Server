@@ -27,13 +27,26 @@ const app = express();
 //  ~~~~~~~~~~~~
 //  ~~  CORS  ~~
 const cors = require('cors');
-// app.use(cors());
-let whitelist = [
-  process.env.CLIENT_ORIGIN_DEV,
-  process.env.CLIENT_ORIGIN_STAGE,
-  process.env.CLIENT_ORIGIN_GK,
-  process.env.CLIENT_ORIGIN_CONOR,
-];
+
+// let whitelist = [
+//   process.env.CLIENT_ORIGIN_DEV,
+//   process.env.CLIENT_ORIGIN_STAGE,
+//   process.env.CLIENT_ORIGIN_GK,
+//   process.env.CLIENT_ORIGIN_CONOR,
+// ];
+// let corsOptions = {
+//   origin: function (origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1 || !origin) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+//   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+//   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+// };
+
 let envOrigin;
 switch (process.env.NODE_ENV) {
   case 'development':
@@ -45,30 +58,17 @@ switch (process.env.NODE_ENV) {
   case 'production':
     envOrigin = process.env.CLIENT_ORIGIN_CONOR;
     break;
-
   default:
     envOrigin = process.env.CLIENT_ORIGIN_CONOR;
     break;
 }
-
 let corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  // allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+  origin: envOrigin,
+  methods: ['GET', 'HEAD', 'POST', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
-// let corsOptions = {
-//   origin: envOrigin,
-//   methods: ['GET', 'HEAD', 'POST', 'DELETE'],
-//   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
-//   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-// };
+
 //  CORS - Pre-Flight
 app.options('*', cors(corsOptions)); // enable pre-flight for all, include before other routes
 // app.options('/api/auth/login', cors(corsOptions), (req, res, next) => {
@@ -84,9 +84,6 @@ app.options('/api/test', cors(corsOptions), (req, res, next) => {
   });
 });
 app.use(cors(corsOptions));
-
-// app.options('*', cors()); // enable pre-flight for all, include before other routes
-// app.use(cors());
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    MIDDLEWARE
