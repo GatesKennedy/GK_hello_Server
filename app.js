@@ -51,24 +51,24 @@ switch (process.env.NODE_ENV) {
     break;
 }
 
-// let corsOptions = {
-//   origin: function (origin, callback) {
-//     if (whitelist.indexOf(origin) !== -1 || !origin) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   },
-//   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-//   // allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
-//   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-// };
 let corsOptions = {
-  origin: envOrigin,
-  methods: ['GET', 'HEAD', 'POST', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  // allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
+// let corsOptions = {
+//   origin: envOrigin,
+//   methods: ['GET', 'HEAD', 'POST', 'DELETE'],
+//   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+//   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+// };
 //  CORS - Pre-Flight
 app.options('*', cors(corsOptions)); // enable pre-flight for all, include before other routes
 // app.options('/api/auth/login', cors(corsOptions), (req, res, next) => {
