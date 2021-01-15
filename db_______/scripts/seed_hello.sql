@@ -25,24 +25,24 @@ CREATE TYPE talk_type   AS ENUM ('chat', 'note');
 CREATE TYPE share_type  AS ENUM ('text', 'image', 'audio', 'link', 'note');
 
 CREATE TABLE IF NOT EXISTS tbl_user(
-    id          UUID        NOT NULL DEFAULT uuid_generate_v4(),
-    name        VARCHAR(16) NOT NULL,                           
-    email       VARCHAR(64) NOT NULL,
-    password    VARCHAR(64) NOT NULL,
-    role        role_type   NOT NULL DEFAULT 'user',
-    date_join   date        NOT NULL DEFAULT CURRENT_DATE,
+    id          UUID            NOT NULL DEFAULT uuid_generate_v4(),
+    name        VARCHAR(16)     NOT NULL,                           
+    email       VARCHAR(64)     NOT NULL,
+    password    VARCHAR(64)     NOT NULL,
+    role        role_type       NOT NULL DEFAULT 'user',
+    date_join   date            NOT NULL DEFAULT CURRENT_DATE,
     PRIMARY KEY (id)
 );
 CREATE TABLE IF NOT EXISTS tbl_profile(
-    user_id         UUID            REFERENCES tbl_user(id) ON DELETE CASCADE,
-    entity          entity_type     NOT NULL DEFAULT 'void',
-    website         VARCHAR(128),
-    thought         VARCHAR,
-    puzzle          TEXT,
-    joke            TEXT,
-    question        TEXT,
-    img_url         TEXT,
-    location        VARCHAR(50)
+    user_id     UUID            REFERENCES tbl_user(id) ON DELETE CASCADE,
+    entity      entity_type     NOT NULL DEFAULT 'void',
+    website     VARCHAR(128),
+    thought     VARCHAR,
+    puzzle      TEXT,
+    joke        TEXT,
+    question    TEXT,
+    img_url     TEXT,
+    location    VARCHAR(50)
 );
 CREATE TABLE IF NOT EXISTS tbl_prof_history(
     id          SERIAL,
@@ -54,25 +54,25 @@ CREATE TABLE IF NOT EXISTS tbl_prof_history(
 );
 
 CREATE TABLE IF NOT EXISTS tbl_talk(
-    id          UUID        DEFAULT uuid_generate_v4(),
-    type        talk_type   NOT NULL,                           --  INDEX
-    seen        BOOLEAN     NOT NULL DEFAULT true,
-    date_init   DATE        NOT NULL DEFAULT CURRENT_DATE,
+    id          UUID            DEFAULT uuid_generate_v4(),
+    type        talk_type       NOT NULL,                 --        --      --  INDEX
+    seen        BOOLEAN         NOT NULL DEFAULT true,
+    date_init   DATE            NOT NULL DEFAULT CURRENT_DATE,
     PRIMARY KEY (id)
 );
 CREATE TABLE IF NOT EXISTS tbl_talk_history(
     id          SERIAL,
     talk_id     UUID            REFERENCES tbl_talk(id) ON DELETE CASCADE,  --  INDEX
-    send_id     UUID            REFERENCES tbl_user(id) ON DELETE SET NULL,  --  INDEX
-    body        JSONB           NOT NULL,                          --  INDEX
+    send_id     UUID            REFERENCES tbl_user(id) ON DELETE CASCADE,  --  INDEX   (SET NULL vs CASCADE)
+    body        JSONB           NOT NULL,                                   --  INDEX
     seen        BOOLEAN         NOT NULL DEFAULT true,
     date_time   TIMESTAMPtz     NOT NULL DEFAULT CURRENT_TIMESTAMP,      
     edit_note   TEXT            NOT NULL DEFAULT 'NO_ENTRY',        --(-_-)--
     PRIMARY KEY (id)
 );
 CREATE TABLE IF NOT EXISTS tbl_access(
-    user_id     UUID        REFERENCES tbl_user(id) ON DELETE SET NULL,   --  INDEX
-    talk_id     UUID        REFERENCES tbl_talk(id) ON DELETE CASCADE,
+    user_id     UUID            REFERENCES tbl_user(id) ON DELETE CASCADE,  --  INDEX   (SET NULL vs CASCADE)
+    talk_id     UUID            REFERENCES tbl_talk(id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, talk_id)
 );
 
@@ -99,7 +99,6 @@ CREATE INDEX idx_genre       ON tbl_access                   (user_id);
 --     ;
 --~~~~~~~~~~~~~~~~~
 --      VIEW
-
 
 --  .sql Script from CMD
 --===============================
