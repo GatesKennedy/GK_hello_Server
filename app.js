@@ -59,12 +59,12 @@ switch (process.env.NODE_ENV) {
     envOrigin = process.env.CLIENT_ORIGIN_CONOR;
     break;
   default:
-    envOrigin = process.env.CLIENT_ORIGIN_CONOR;
+    envOrigin = process.env.CLIENT_ORIGIN;
     break;
 }
 let corsOptions = {
   origin: envOrigin,
-  methods: ['GET', 'HEAD', 'POST', 'DELETE'],
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
