@@ -1,4 +1,10 @@
-const { NODE_ENV } = process.env;
+// const { c } = process.env; //!!!
+
+//~~~~~~~~~~~~~~~~~~~~~~~
+//    Environment
+//~~~~~~~~~~~~~~~~~~~~~~~
+import 'dotenv/config' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+console.log("\n~~~~~~~~~~~~\nprocess.env.NODE_ENV = \n~~~~~~~~~~~~\n", process.env.NODE_ENV);
 
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    Classes
@@ -21,7 +27,7 @@ class AppError extends Error {
 //~~~~~~~~~~~~~~~~~~~~~~~
 
 //  init express app
-const express = require('express');
+import express from 'express'
 const app = express();
 
 //  ~~~~~~~~~~~~
@@ -77,6 +83,12 @@ app.options('*', cors(corsOptions)); // enable pre-flight for all, include befor
 //       envOrigin: ${envOrigin}`,
 //   });
 // });
+app.options('/api/test', cors(corsOptions), (req, res, next) => {
+  res.json({
+    msg: `'CORS-enabled Pre-Flight'
+      envOrigin: ${envOrigin}`,
+  });
+});
 app.use(cors(corsOptions));
 
 //~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,7 +101,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //  express-sslify
 const enforce = require('express-sslify');
-if (NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production') {
   app.use(enforce.HTTPS({ trustProtoHeader: true }));
   //  Use enforce.HTTPS({ trustProtoHeader: true }) in case you are behind a load balancer (e.g. Heroku).
   //  See further comments below > [https://www.npmjs.com/package/express-sslify]
@@ -110,9 +122,9 @@ app.use(
 );
 
 //  secure Redirect Heroku
-const { secureRedirectHerokuMW } = require('./api_______/middleware/security');
-const dev = NODE_ENV === 'development';
-app.use(secureRedirectHerokuMW({ NodeEnv: dev }));
+// const { secureRedirectHerokuMW } = require('./api_______/middleware/security');
+// const dev = NODE_ENV === 'development';
+// app.use(secureRedirectHerokuMW({ NodeEnv: dev }));
 
 //  validate Token
 // const { validateToken } = require('./api_______/middleware/auth');
@@ -143,7 +155,6 @@ app.use((err, req, res, next) => {
 //      ROUTES
 //~~~~~~~~~~~~~~~~~~~~~~~
 //  import
-const sock = require(`./sock_______/api/sock`);
 const auth = require('./api_______/api/auth');
 const user = require('./api_______/api/user');
 const talk = require('./api_______/api/talk');
@@ -155,7 +166,6 @@ const test = require('./api_______/api/test');
 //  init
 app.use('/api/auth', auth);
 app.use('/api/user', user);
-app.use('/api/sock', sock);
 app.use('/api/talk', talk);
 app.use('/api/chat', chat);
 app.use('/api/note', note);
@@ -168,12 +178,12 @@ app.all('*', (req, res, next) => {
 //~~~~~~~~~~~~~~~~~~~~~~~
 //    Server Init
 //~~~~~~~~~~~~~~~~~~~~~~~
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5555;
 const http = require('http');
 //  init
 const serv = http.createServer(app);
 serv.listen(PORT, () => {
-  if (NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production') {
     console.log(`
     ~~~~~~~~~ server.js ~~~~~~~~~
     (^=^)  production listening on port ${PORT}
@@ -181,7 +191,7 @@ serv.listen(PORT, () => {
             Origin: ${envOrigin}
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     `);
-  } else if (NODE_ENV === 'development') {
+  } else if (process.env.NODE_ENV === 'development') {
     console.log(`
     ~~~~~~~~~ server.js ~~~~~~~~~
     (^=^)  development listening on port ${PORT}
@@ -191,17 +201,5 @@ serv.listen(PORT, () => {
     `);
   }
 });
-
-//~~~~~~~~~~~~~~~~~~~~~~~
-//    Socket.io
-//~~~~~~~~~~~~~~~~~~~~~~~
-
-//  import
-const SockService = require('./sock_______/utils/ClassSocket');
-const SocketIO = require('socket.io');
-//  init
-const sockServe = new SockService();
-io = SocketIO(serv);
-io.on('connection', sockServe.connection);
 
 module.exports = serv;
