@@ -1,3 +1,4 @@
+import 'regenerator-runtime/runtime';
 //  EXPRESS
 const express = require('express');
 const router = express.Router();
